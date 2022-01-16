@@ -1,8 +1,9 @@
+using System;
 using UnityEngine;
 
-public class PlatformBehaviour : MonoBehaviour, IPoolable
+public class PlatformBehaviour : MonoBehaviour
 {
-    private PlatformData _data;
+    [SerializeField] private PlatformData data;
     
     public void ReturnToPool()
     {
@@ -14,5 +15,15 @@ public class PlatformBehaviour : MonoBehaviour, IPoolable
         if (gameObject.activeInHierarchy) return;
         gameObject.transform.position = position;
         gameObject.SetActive(true);
+    }
+
+    public void InitializePoolObject(Vector3 startingPosition)
+    {
+        Instantiate(data.prefab, startingPosition, Quaternion.identity);
+    }
+
+    private void Awake()
+    {
+        Instantiate(data.prefab, transform);
     }
 }

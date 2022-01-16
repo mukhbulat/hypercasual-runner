@@ -4,9 +4,13 @@ using UnityEngine;
 
 public class PlatformSpawner : MonoBehaviour
 {
-    [SerializeField] private List<PlatformData> platforms;
+    [SerializeField] private List<PlatformBehaviour> platforms;
 
+    private List<PlatformBehaviour> _platformPool;
     private Camera _camera;
+    private int maxPlatformsCount = 30;
+    
+    
     private void Awake()
     {
         _camera = Camera.main;
@@ -14,5 +18,6 @@ public class PlatformSpawner : MonoBehaviour
 
     private void Update()
     {
+        
     }
 }
