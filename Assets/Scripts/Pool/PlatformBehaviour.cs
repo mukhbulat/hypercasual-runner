@@ -6,14 +6,14 @@ namespace Pool
     {
         #region Interfaces
 
-        public bool IsActive()
+        public void MoveForward()
         {
-            return gameObject.activeInHierarchy;
+            
         }
 
         public GameObject Initialize()
         {
-            return null;
+            return Instantiate(gameObject);
         }
         
         #endregion

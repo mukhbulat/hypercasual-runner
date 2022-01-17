@@ -5,6 +5,6 @@ namespace Pool
     public interface IPoolable
     {
         public GameObject Initialize();
-        public bool IsActive();
+        public void MoveForward();
     }
 }
