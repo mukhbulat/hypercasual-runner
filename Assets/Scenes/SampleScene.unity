@@ -159,8 +159,12 @@ MonoBehaviour:
   - {fileID: 3597441831605833925, guid: c181f4c3e4177587c8693b9e1cd97a09, type: 3}
   playerTransform: {fileID: 154500853}
   zOffsetBack: 10
-  timeToSpawn: 1
+  timeToSpawn: 0.2
+  heightBetweenPlatforms: 3
+  distanceBetweenPlatforms: 4
   zOffsetForward: 25
+  yMaxRandomOffset: 20
+  zMaxRandomOffset: 20
 --- !u!4 &2328506
 Transform:
   m_ObjectHideFlags: 0
@@ -316,7 +320,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 287152877}
-  m_LocalRotation: {x: 0.05641923, y: -0.6322995, z: 0.046252705, w: 0.77128136}
+  m_LocalRotation: {x: 0.056419242, y: -0.6322995, z: 0.046252716, w: 0.77128136}
   m_LocalPosition: {x: 11, y: 2.5, z: 8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -589,7 +593,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.05641923, y: -0.6322995, z: 0.046252705, w: 0.77128136}
+  m_LocalRotation: {x: 0.056419242, y: -0.6322995, z: 0.046252716, w: 0.77128136}
   m_LocalPosition: {x: 11, y: 2.5, z: 8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []

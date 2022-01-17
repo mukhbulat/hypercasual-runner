@@ -15,8 +15,9 @@ namespace Pool
 
         [SerializeField] private Transform playerTransform;
         [SerializeField] private float zOffsetBack = 10f;
-        [SerializeField] private float timeToSpawn = 1f;
+        [SerializeField] private float timeToSpawn = 0.3f;
         [SerializeField] private int heightBetweenPlatforms = 3;
+        [SerializeField] private int distanceBetweenPlatforms = 4;
         [SerializeField] private float zOffsetForward = 20f;
         [SerializeField] private int yMaxRandomOffset = 5;
         [SerializeField] private int zMaxRandomOffset = 20;
@@ -71,8 +72,8 @@ namespace Pool
 
         private Vector3 FindNewPositionForPlatform()
         {
-            int zCurrentRandomOffset = Random.Range(0, zMaxRandomOffset);
-            int yCurrentRandomOffset = Random.Range(0, yMaxRandomOffset) * heightBetweenPlatforms + heightBetweenPlatforms;
+            int zCurrentRandomOffset = Random.Range(1, zMaxRandomOffset) * distanceBetweenPlatforms;
+            int yCurrentRandomOffset = Random.Range(1, yMaxRandomOffset) * heightBetweenPlatforms;
             return new Vector3(0, yCurrentRandomOffset, PlayerZPosition + zOffsetForward + zCurrentRandomOffset);
         }
 
