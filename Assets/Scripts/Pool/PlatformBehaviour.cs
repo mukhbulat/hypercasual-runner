@@ -6,14 +6,19 @@ namespace Pool
     {
         #region Interfaces
 
-        public void MoveForward()
+        public void MoveForward(Vector3 newPosition)
         {
-            
+            transform.position = newPosition;
         }
 
         public GameObject Initialize()
         {
             return Instantiate(gameObject);
+        }
+
+        public float GetPosition()
+        {
+            return transform.position.z;
         }
         
         #endregion
