@@ -16,8 +16,12 @@ namespace Pool
         [SerializeField] private Transform playerTransform;
         [SerializeField] private float zOffsetBack = 10f;
         [SerializeField] private float timeToSpawn = 1f;
+        [SerializeField] private int heightBetweenPlatforms = 3;
         [SerializeField] private float zOffsetForward = 20f;
-
+        [SerializeField] private int yMaxRandomOffset = 5;
+        [SerializeField] private int zMaxRandomOffset = 20;
+        
+        
         private enum PooledObject
         {
             Platform,
@@ -55,7 +59,7 @@ namespace Pool
             if (queue.Peek().GetPosition() < PlayerZPosition - zOffsetBack)
             {
                 IPoolable temporary = queue.Dequeue();
-                temporary.MoveForward(FindNewPosition(PooledObject.Platform));
+                temporary.MoveForward(FindNewPositionForPlatform());
                 queue.Enqueue(temporary);
                 yield return null;
             }
@@ -65,17 +69,11 @@ namespace Pool
             }
         }
 
-        private Vector3 FindNewPosition(PooledObject objectType)
+        private Vector3 FindNewPositionForPlatform()
         {
-            switch (objectType)
-            {
-                case PooledObject.Platform:
-                {
-                    return new Vector3(0, 3, PlayerZPosition + zOffsetForward);
-                }
-            }
-
-            throw new Exception("Unknown objectType");
+            int zCurrentRandomOffset = Random.Range(0, zMaxRandomOffset);
+            int yCurrentRandomOffset = Random.Range(0, yMaxRandomOffset) * heightBetweenPlatforms + heightBetweenPlatforms;
+            return new Vector3(0, yCurrentRandomOffset, PlayerZPosition + zOffsetForward + zCurrentRandomOffset);
         }
 
     }
