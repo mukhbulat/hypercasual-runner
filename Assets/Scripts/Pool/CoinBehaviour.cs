@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using DG.Tweening;
 
 namespace Pool
 {
@@ -13,7 +15,15 @@ namespace Pool
         
         public void Obtain()
         {
-            inventory.Coins += 1;
+            if (isX2)
+            {
+                inventory.Coins += 2;
+            }
+            else
+            {
+                inventory.Coins += 1;
+            }
+            transform.position = Vector3.zero;
         }
 
         public GameObject Initialize()
@@ -41,6 +51,13 @@ namespace Pool
         private void OnX2Lose()
         {
             isX2 = false;
+        }
+
+        private void Update()
+        {
+            //double transformX = transform.position.x;
+            //transform.DORotate(new Vector3(0, 360, 0), 3);
+            //DOTween.To(() => transformX, x => transformX = x, 1.5, 1);
         }
     }
 }
