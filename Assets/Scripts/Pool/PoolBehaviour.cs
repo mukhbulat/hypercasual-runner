@@ -9,73 +9,99 @@ namespace Pool
 {
     public class PoolBehaviour : MonoBehaviour
     {
-        [SerializeField] private List<GameObject> platformPrefabs;
-        private Queue<IPoolable> _platformsInGame = new Queue<IPoolable>(60);
-
-
+        // Platform private fields.
+        private List<IPoolable> _platformsOnFirstFloor;
+        private List<IPoolable> _platformsOnSecondFloor;
+        private List<IPoolable> _platformsOnThirdFloor;
+        
+        // The Only thing I know for real about Player. 
         [SerializeField] private Transform playerTransform;
-        [SerializeField] private float zOffsetBack = 10f;
-        [SerializeField] private float timeToSpawn = 0.3f;
-        [SerializeField] private int heightBetweenPlatforms = 3;
-        [SerializeField] private int distanceBetweenPlatforms = 4;
-        [SerializeField] private float zOffsetForward = 20f;
-        [SerializeField] private int yMaxRandomOffset = 5;
-        [SerializeField] private int zMaxRandomOffset = 20;
-        
-        
-        private enum PooledObject
-        {
-            Platform,
-            Coin
-        }
-        
         private float PlayerZPosition => playerTransform.transform.position.z; 
+        
+        // Platforms Serialized Fields.
+        [SerializeField] private List<GameObject> platformPrefabs;
+
+        [SerializeField] private int platformsListsCapacity = 20;
+        [SerializeField] private float floorToPlatformLengthRatio = 2;
+        // The less - the easier.
+        [SerializeField] private float zOffsetBack = 10f;
+        [SerializeField] private float timeToSpawnPlatform = 0.2f;
+        [SerializeField] private int heightBetweenPlatforms = 3;
+        [SerializeField] private int distanceBetweenPlatforms = 8;
+        [SerializeField] private float zOffsetForward = 20f;
+        [SerializeField] private int zMaxRandomOffset = 4;
+        [SerializeField] private int floorHeight = 12;
+        //[SerializeField] private int heightOfPlatform = 1;
+        
         private void Awake()
         {
-            CreateQueue();
+            // Would lag at awake. May be coroutine for three initializes?
+            _platformsOnFirstFloor = new List<IPoolable>(platformsListsCapacity);
+            _platformsOnSecondFloor = new List<IPoolable>(platformsListsCapacity);
+            _platformsOnThirdFloor = new List<IPoolable>(platformsListsCapacity);
+            InitializePlatforms(_platformsOnFirstFloor, 1);
+            InitializePlatforms(_platformsOnSecondFloor, 2);
+            InitializePlatforms(_platformsOnThirdFloor, 3);
         }
 
         private void Update()
         {
-            StartCoroutine(SwapPlatforms(_platformsInGame));
+            StartCoroutine(MovePlatformsForward(_platformsOnFirstFloor, 1));
         }
 
-        private void CreateQueue()
+        private void InitializePlatforms(List<IPoolable> listToInitialize, int floor)
         {
-            // 60 is the capacity of _platformsInGame.
-            int everyPlatformTypeCount = 60 / platformPrefabs.Count;
-            // Nested loop.
-            foreach (var platform in platformPrefabs)
+            float randomLengthRatio = 1 / (floor * floorToPlatformLengthRatio);
+            for (int i = 0; i < platformsListsCapacity; i ++)
             {
-                for (int j = 0; j < everyPlatformTypeCount; j++)
+                // Bad! Could be worse.
+                // At least this is not in update.
+                if (Random.value < randomLengthRatio)
                 {
-                    IPoolable instance = platform.GetComponent<IPoolable>().Initialize().GetComponent<IPoolable>();
-                    _platformsInGame.Enqueue(instance);
+                    listToInitialize.Add(platformPrefabs[0].GetComponent<IPoolable>().Initialize().GetComponent<IPoolable>());
+                }
+                else if (Random.value < randomLengthRatio)
+                {
+                    listToInitialize.Add(platformPrefabs[1].GetComponent<IPoolable>().Initialize().GetComponent<IPoolable>());
+                }
+                else 
+                {
+                    listToInitialize.Add(platformPrefabs[2].GetComponent<IPoolable>().Initialize().GetComponent<IPoolable>());
                 }
             }
         }
 
-        private IEnumerator SwapPlatforms(Queue<IPoolable> queue)
+        private IEnumerator MovePlatformsForward(List<IPoolable> platforms, int floor)
         {
-            if (queue.Peek().GetPosition() < PlayerZPosition - zOffsetBack)
+            while (true)
             {
-                IPoolable temporary = queue.Dequeue();
-                temporary.MoveForward(FindNewPositionForPlatform());
-                queue.Enqueue(temporary);
-                yield return null;
-            }
-            else
-            {
-                yield return new WaitForSeconds(timeToSpawn);
+                foreach (var platform in platforms)
+                {
+                    if (platform.GetZPosition() < PlayerZPosition - zOffsetBack)
+                    {
+                        platform.MoveForward(FindNewPositionForPlatform(floor));
+                    }
+
+                    yield return null;
+                }
+                yield return new WaitForSeconds(timeToSpawnPlatform);
             }
         }
 
-        private Vector3 FindNewPositionForPlatform()
+        private Vector3 FindNewPositionForPlatform(int floor)
+        // The whole system shouldn't be random. I need to draw like 10 variations for each floor
+        // and randomly select one of them for the next sector of the gameplay.
+        // So, the whole method is dummy for the later system.
         {
+            int maxY = floor * floorHeight;
+            int minY = (floor - 1) * floorHeight;
+            int yMaxRandomOffset = maxY / heightBetweenPlatforms - 1;
             int zCurrentRandomOffset = Random.Range(1, zMaxRandomOffset) * distanceBetweenPlatforms;
-            int yCurrentRandomOffset = Random.Range(1, yMaxRandomOffset) * heightBetweenPlatforms;
+            int yCurrentRandomOffset = Random.Range(minY + 1, yMaxRandomOffset + 1);
+            yCurrentRandomOffset = yCurrentRandomOffset * heightBetweenPlatforms + minY + yCurrentRandomOffset - 1;
+            if (yCurrentRandomOffset > maxY) throw new Exception($"What the fuck {yCurrentRandomOffset}");
             return new Vector3(0, yCurrentRandomOffset, PlayerZPosition + zOffsetForward + zCurrentRandomOffset);
         }
-
+        
     }
 }

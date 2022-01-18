@@ -16,11 +16,11 @@ namespace Pool
             return Instantiate(gameObject);
         }
 
-        public float GetPosition()
+        public float GetZPosition()
         {
             return transform.position.z;
         }
-        
+
         #endregion
 
     }

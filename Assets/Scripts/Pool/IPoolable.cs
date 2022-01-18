@@ -6,6 +6,6 @@ namespace Pool
     {
         public GameObject Initialize();
         public void MoveForward(Vector3 newPosition);
-        public float GetPosition();
+        public float GetZPosition();
     }
 }

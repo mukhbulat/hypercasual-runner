@@ -152,19 +152,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d6bc54364854f41bb071230ed75eac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  platformPrefabs:
-  - {fileID: 1124121359491663057, guid: 67841e864279013939b560aa0105b27d, type: 3}
-  - {fileID: 6467294299640937106, guid: eca07fa1d508d155ab89d4c94e0a9141, type: 3}
-  - {fileID: 2111749767193705061, guid: 77f04a1b8ff888ef6b0a09b023f9e459, type: 3}
-  - {fileID: 3597441831605833925, guid: c181f4c3e4177587c8693b9e1cd97a09, type: 3}
   playerTransform: {fileID: 154500853}
+  platformPrefabs:
+  - {fileID: 2111749767193705061, guid: 77f04a1b8ff888ef6b0a09b023f9e459, type: 3}
+  - {fileID: 6467294299640937106, guid: eca07fa1d508d155ab89d4c94e0a9141, type: 3}
+  - {fileID: 1124121359491663057, guid: 67841e864279013939b560aa0105b27d, type: 3}
+  platformsListsCapacity: 20
+  floorToPlatformLengthRatio: 2
   zOffsetBack: 10
-  timeToSpawn: 0.2
+  timeToSpawnPlatform: 0.1
   heightBetweenPlatforms: 3
-  distanceBetweenPlatforms: 4
+  distanceBetweenPlatforms: 8
   zOffsetForward: 25
-  yMaxRandomOffset: 20
-  zMaxRandomOffset: 20
+  zMaxRandomOffset: 4
+  floorHeight: 12
+  heightOfPlatform: 1
 --- !u!4 &2328506
 Transform:
   m_ObjectHideFlags: 0
@@ -320,7 +322,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 287152877}
-  m_LocalRotation: {x: 0.056419242, y: -0.6322995, z: 0.046252716, w: 0.77128136}
+  m_LocalRotation: {x: 0.056419265, y: -0.6322995, z: 0.04625273, w: 0.77128136}
   m_LocalPosition: {x: 11, y: 2.5, z: 8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -593,7 +595,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.056419242, y: -0.6322995, z: 0.046252716, w: 0.77128136}
+  m_LocalRotation: {x: 0.056419265, y: -0.6322995, z: 0.04625273, w: 0.77128136}
   m_LocalPosition: {x: 11, y: 2.5, z: 8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
