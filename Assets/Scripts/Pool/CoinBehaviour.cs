@@ -4,28 +4,43 @@ namespace Pool
 {
     public class CoinBehaviour : MonoBehaviour, ICollectable, IPoolable
     {
+        
+        [SerializeField] private Inventory inventory;
+
+        private bool isX2 = false;
+        
         #region Interfaces
         
         public void Obtain()
         {
-            throw new System.NotImplementedException();
+            inventory.Coins += 1;
         }
 
         public GameObject Initialize()
         {
-            throw new System.NotImplementedException();
+            return Instantiate(gameObject);
         }
 
         public void MoveForward(Vector3 newPosition)
         {
-            throw new System.NotImplementedException();
+            transform.position = newPosition;
         }
 
         public float GetZPosition()
         {
-            throw new System.NotImplementedException();
+            return transform.position.z;
         }
         
         #endregion
+
+        private void OnX2Get()
+        {
+            isX2 = true;
+        }
+
+        private void OnX2Lose()
+        {
+            isX2 = false;
+        }
     }
 }

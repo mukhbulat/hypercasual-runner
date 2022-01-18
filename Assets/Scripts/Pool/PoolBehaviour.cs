@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.ProBuilder.MeshOperations;
 using Random = UnityEngine.Random;
 
 namespace Pool
@@ -91,7 +90,7 @@ namespace Pool
         private Vector3 FindNewPositionForPlatform(int floor)
         // The whole system shouldn't be random. I need to draw like 10 variations for each floor
         // and randomly select one of them for the next sector of the gameplay.
-        // So, the whole method is dummy for the later system.
+        // So, the whole method is dummy for the later system. Event the whole class.
         {
             int maxY = floor * floorHeight;
             int minY = (floor - 1) * floorHeight;
