@@ -53,6 +53,11 @@ namespace Pool
             isX2 = false;
         }
 
+        private void Awake()
+        {
+            inventory = GameObject.FindWithTag("Player").GetComponent<Inventory>();
+        }
+
         private void Update()
         {
             //double transformX = transform.position.x;
