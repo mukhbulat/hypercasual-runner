@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Pool
 {
-    [CreateAssetMenu()]
+    [CreateAssetMenu]
     public class LevelSegment : ScriptableObject
     {
         public List<Vector3> X3Platforms;

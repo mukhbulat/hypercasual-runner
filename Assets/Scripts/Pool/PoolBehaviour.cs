@@ -21,6 +21,7 @@ namespace Pool
         // Platforms
         // Platforms Serialized Fields.
         [SerializeField] private List<GameObject> platformPrefabs;
+        [SerializeField] private List<LevelSegment> levelSegments;
 
         [SerializeField] private int platformsListsCapacity = 20;
         [SerializeField] private float floorToPlatformLengthRatio = 2;
@@ -169,6 +170,16 @@ namespace Pool
             yCurrentRandomOffset = yCurrentRandomOffset * heightBetweenPlatforms + minY + yCurrentRandomOffset - 1;
             if (yCurrentRandomOffset > maxY) throw new Exception($"What the fuck {yCurrentRandomOffset}");
             return new Vector3(0, yCurrentRandomOffset, PlayerZPosition + zOffsetForward + zCurrentRandomOffset);
+        }
+
+        private void PositionPlatforms()
+        {
+            // Dummy. Make random after couple of segments
+            var levelSegment = levelSegments[0];
+                foreach (var VARIABLE in levelSegment.X3Platforms)
+                {
+                    
+                }
         }
 
         #endregion
