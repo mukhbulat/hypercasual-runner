@@ -14,8 +14,8 @@ public class PlayerMovement : MonoBehaviour
     //
     private readonly float _speed = 7f;
     private readonly float _acceleration = 0.1f;
-    private readonly float _jumpHeight = 12f;
     private readonly float _gravity = -20.8f;
+    [SerializeField] private float _jumpHeight = 12f;
     [SerializeField] private AnimationCurve speedIncrease;
     [SerializeField] private AnimationCurve speedAtMaxSpeed;
     
