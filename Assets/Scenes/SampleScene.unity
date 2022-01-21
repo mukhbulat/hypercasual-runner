@@ -155,17 +155,11 @@ MonoBehaviour:
   playerTransform: {fileID: 154500853}
   zOffsetBack: 10
   zOffsetForward: 25
-  platformPrefabs:
-  - {fileID: 2111749767193705061, guid: 77f04a1b8ff888ef6b0a09b023f9e459, type: 3}
-  - {fileID: 6467294299640937106, guid: eca07fa1d508d155ab89d4c94e0a9141, type: 3}
-  - {fileID: 1124121359491663057, guid: 67841e864279013939b560aa0105b27d, type: 3}
-  platformsListsCapacity: 20
-  floorToPlatformLengthRatio: 2
-  timeToSpawnPlatform: 0.1
-  heightBetweenPlatforms: 3
-  distanceBetweenPlatforms: 8
-  zMaxRandomOffset: 4
-  floorHeight: 12
+  platformPrefab: {fileID: 6625376001187727680, guid: a88675e88d7132c36a1e8de2e059748c, type: 3}
+  levelSegments:
+  - {fileID: 11400000, guid: 7e143c02db75d6f13995390339a8cf02, type: 2}
+  numberOfTypesOfPlatforms: 3
+  platformsCapacity: 40
   coinPrefab: {fileID: 8976715280636190507, guid: 8006ed7e010252558af649bda8feeca9, type: 3}
   coinsCapacity: 140000001e00000028000000
   timeToSpawnCoin: 0.1
@@ -338,7 +332,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 287152877}
-  m_LocalRotation: {x: 0.056419235, y: -0.6322995, z: 0.04625271, w: 0.77128136}
+  m_LocalRotation: {x: 0.056419265, y: -0.6322995, z: 0.04625273, w: 0.77128136}
   m_LocalPosition: {x: 11, y: 2.5, z: -22}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -611,7 +605,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.056419235, y: -0.6322995, z: 0.04625271, w: 0.77128136}
+  m_LocalRotation: {x: 0.056419265, y: -0.6322995, z: 0.04625273, w: 0.77128136}
   m_LocalPosition: {x: 11, y: 2.5, z: -22}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []

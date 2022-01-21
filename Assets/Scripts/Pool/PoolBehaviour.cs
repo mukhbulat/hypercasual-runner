@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Pool.Platforms;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -20,23 +21,18 @@ namespace Pool
 
         // Platforms
         // Platforms Serialized Fields.
-        [SerializeField] private List<GameObject> platformPrefabs;
+        [SerializeField] private GameObject platformPrefab;
         [SerializeField] private List<LevelSegment> levelSegments;
 
-        [SerializeField] private int platformsListsCapacity = 20;
-        [SerializeField] private float floorToPlatformLengthRatio = 2;
-        // The less - the easier.
-        [SerializeField] private float timeToSpawnPlatform = 0.2f;
-        [SerializeField] private int heightBetweenPlatforms = 3;
-        [SerializeField] private int distanceBetweenPlatforms = 8;
-        [SerializeField] private int zMaxRandomOffset = 4;
-        [SerializeField] private int floorHeight = 12;
+        // Need to change capacity after adding new segment with more platforms than in capacity.
+        // May be first take all the LevelSegments, count platforms and make capacity to fill all the platforms.
+        [SerializeField] private int numberOfTypesOfPlatforms = 3;
+        [SerializeField] private int platformsCapacity = 40;
         
         // Platform private fields.
-        private List<IPoolable> _platformsOnFirstFloor;
-        private List<IPoolable> _platformsOnSecondFloor;
-        private List<IPoolable> _platformsOnThirdFloor;
-        
+        // Queue consists of three lists: previous segment of platforms, current and next.
+        private Queue<List<IPlatform>> _platforms = new Queue<List<IPlatform>>(3);
+
         // Coins
         // Coins Serialized Fields.
         [SerializeField] private GameObject coinPrefab;
@@ -44,76 +40,23 @@ namespace Pool
         [SerializeField] private float timeToSpawnCoin = 0.1f;
 
         // Coins private fields.
-        private List<IPoolable> _coinsOnFirstFloor;
-        private List<IPoolable> _coinsOnSecondFloor;
-        private List<IPoolable> _coinsOnThirdFloor;
-
         #endregion
         
         private void Awake()
         {
             // Would lag at awake. May be coroutine for three initializes?
             // Platforms
-            _platformsOnFirstFloor = new List<IPoolable>(platformsListsCapacity);
-            _platformsOnSecondFloor = new List<IPoolable>(platformsListsCapacity);
-            _platformsOnThirdFloor = new List<IPoolable>(platformsListsCapacity);
-            InitializePlatforms(_platformsOnFirstFloor, 1);
-            InitializePlatforms(_platformsOnSecondFloor, 2);
-            InitializePlatforms(_platformsOnThirdFloor, 3);
-            // Coins
-            _coinsOnFirstFloor = new List<IPoolable>(coinsCapacity[0]);
-            _coinsOnSecondFloor = new List<IPoolable>(coinsCapacity[1]);
-            _coinsOnThirdFloor = new List<IPoolable>(coinsCapacity[2]);
-            InitializeCoins(_coinsOnFirstFloor, 1);
-            InitializeCoins(_coinsOnSecondFloor, 2);
-            InitializeCoins(_coinsOnThirdFloor, 3);
-            
-        }
-
-        private void Update()
-        {
-            StartCoroutine(MovePlatformsForward(_platformsOnFirstFloor, 1));
-        }
-
-        private void InitializeCoins(List<IPoolable> listToInitialize, int floor)
-        { 
-            for (int i = 0; i < coinsCapacity[floor - 1]; i++)
+            for (int i = 0; i < 3; i++)
             {
-                listToInitialize.Add(coinPrefab.GetComponent<IPoolable>().Initialize().GetComponent<IPoolable>());
+                _platforms.Enqueue(new List<IPlatform>(platformsCapacity));
+                InitializePlatforms(_platforms.Peek());
             }
+            PositionPlatforms(_platforms.Peek());
         }
 
-        private IEnumerator MoveCoinsForward(List<IPoolable> coins, int floor)
-        {
-            for (int i = 0; i < floor; i++)
-            {
-                yield return null;
-            }
-
-            while (true)
-            {
-                foreach (var coin in coins)
-                {
-                    if (coin.GetZPosition() < PlayerZPosition - zOffsetBack)
-                    {
-                        coin.MoveForward(FindNewPositionForCoin(floor));
-                    }
-
-                    yield return null;
-                }
-
-                yield return null;
-            }
-        }
-
-        private Vector3 FindNewPositionForCoin(int floor)
-        {
-            // TODO finding new position on platform. May be easier to remake platform positioning first.
-            return Vector3.zero;
-        }
-        
         #region Platforms
         
+        /*
         private void InitializePlatforms(List<IPoolable> listToInitialize, int floor)
         {
             float randomLengthRatio = 1 / (floor * floorToPlatformLengthRatio);
@@ -171,15 +114,81 @@ namespace Pool
             if (yCurrentRandomOffset > maxY) throw new Exception($"What the fuck {yCurrentRandomOffset}");
             return new Vector3(0, yCurrentRandomOffset, PlayerZPosition + zOffsetForward + zCurrentRandomOffset);
         }
+        */
 
-        private void PositionPlatforms()
+        private void InitializePlatforms(List<IPlatform> listToInitialize)
         {
-            // Dummy. Make random after couple of segments
+            // Dummy. Change, when add new segments.
             var levelSegment = levelSegments[0];
-                foreach (var VARIABLE in levelSegment.X3Platforms)
+            // platformPrefabs: 0 - X3platform prefab, 1 - X5platform prefab, 2 - X7 platform prefab.
+            foreach (var position in levelSegment.X7Platforms)
+            {
+                listToInitialize.Add(platformPrefab.GetComponent<IPlatform>().Initialize(0));
+            }
+
+            foreach (var position in levelSegment.X5Platforms)
+            {
+                listToInitialize.Add(platformPrefab.GetComponent<IPlatform>().Initialize(1));
+            }
+
+            foreach (var position in levelSegment.X3Platforms)
+            {
+                listToInitialize.Add(platformPrefab.GetComponent<IPlatform>().Initialize(2));
+            }
+        }
+        private void PositionPlatforms(List<IPlatform> listWithPlatforms)
+        {
+            // Dummy. Make random after couple of segments.
+            var levelSegment = levelSegments[0];
+            int numberOfX3 = 0;
+            int numberOfX5 = 0;
+            int numberOfX7 = 0;
+            
+            // Piece of shit.
+            // Takes a platform and moves it while the list of this type platforms in levelSegment is not ended.
+            foreach (var platform in listWithPlatforms)
+            {
+                switch (platform.GetPlatformTypeIndex())
                 {
-                    
+                    case 0:
+                    {
+                        if (numberOfX3 < levelSegment.X3Platforms.Count)
+                        {
+                            platform.MoveForward(levelSegment.X3Platforms[numberOfX3]);
+                            numberOfX3 += 1;
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        if (numberOfX5 < levelSegment.X5Platforms.Count)
+                        {
+                            platform.MoveForward(levelSegment.X5Platforms[numberOfX5]);
+                            numberOfX5 += 1;
+                        }
+                        break;
+                    }
+                    case 2:
+                    {
+                        if (numberOfX7 < levelSegment.X7Platforms.Count)
+                        {
+                            platform.MoveForward(levelSegment.X7Platforms[numberOfX7]);
+                            numberOfX7 += 1;
+                        }
+                        break;
+                    }
+                    case -1:
+                    {
+                        throw new Exception("Platform is not initialized");
+                    }
                 }
+            }
+
+            foreach (var x3Platform in levelSegment.X3Platforms)
+            {
+                
+            }
+            
         }
 
         #endregion
