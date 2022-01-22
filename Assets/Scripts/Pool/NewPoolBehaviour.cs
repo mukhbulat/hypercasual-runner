@@ -8,15 +8,22 @@ namespace Pool
     public class NewPoolBehaviour : MonoBehaviour
     {
         #region Fields and properties
-
+        // Player
+        [SerializeField] private Transform player;
+        private float PlayerZPosition => player.transform.position.z;
+        
         // Platforms fields
 
         [SerializeField] private GameObject platformPrefab;
         [SerializeField] private List<LevelSegment> levelSegments;
-
+        
+        [SerializeField] private int lengthOfSegment = 30;
+        [SerializeField] private int offsetToMoveTheSegment = 10;
         [SerializeField] private int platformsCapacity = 50;
 
         private Queue<List<List<IPlatform>>> _platformsInSegments = new Queue<List<List<IPlatform>>>(3);
+        private int currentSegment;
+        private int nextSegment = 1;
 
         private int NumberOfTypesOfPlatforms => platformPrefab.GetComponent<IPlatform>().GetNumberOfTypesOfPlatforms();
 
@@ -28,13 +35,21 @@ namespace Pool
         {
             InitializeQueue();
             var temporaryList = _platformsInSegments.Dequeue();
-            MovePlatforms(temporaryList);
+            MovePlatforms(temporaryList, 0);
             _platformsInSegments.Enqueue(temporaryList);
         }
 
         private void Update()
         {
-            
+            float modulo = PlayerZPosition % lengthOfSegment;
+            currentSegment = (int) PlayerZPosition / lengthOfSegment;
+            if (currentSegment == nextSegment && modulo > offsetToMoveTheSegment)
+            {
+                nextSegment += 1;
+                var temporarySegment = _platformsInSegments.Dequeue();
+                MovePlatforms(temporarySegment, currentSegment * lengthOfSegment);
+                _platformsInSegments.Enqueue(temporarySegment);
+            }
         }
 
         #region Platforms
@@ -53,7 +68,6 @@ namespace Pool
             // Double Nested Loop. :(
             // At least it would be in Awake. May be make it coroutine and add yield return null to make it on different
             // frames?
-            // 
             for (int j = 0; j < NumberOfTypesOfPlatforms; j++)
             {
                 listToInit.Add(new List<IPlatform>(platformsCapacity));
@@ -64,14 +78,16 @@ namespace Pool
             }
         }
 
-        private void MovePlatforms(List<List<IPlatform>> listToMove)
+        private void MovePlatforms(List<List<IPlatform>> listToMove, int zOffset)
         {
             // Dummy. Make random after making more than one of levelSegments.
             var levelSegment = levelSegments[0];
+
+            Vector3 offset = new Vector3(0, 0, zOffset);
             int i = 0;
             foreach (var position in levelSegment.X3Platforms)
             {
-                listToMove[0][i].MoveForward(position);
+                listToMove[0][i].MoveForward(position + offset);
                 i += 1;
             }
             
@@ -79,7 +95,7 @@ namespace Pool
             
             foreach (var position in levelSegment.X5Platforms)
             {
-                listToMove[1][i].MoveForward(position);
+                listToMove[1][i].MoveForward(position + offset);
                 i += 1;
             }
             
@@ -87,9 +103,11 @@ namespace Pool
 
             foreach (var position in levelSegment.X7Platforms)
             {
-                listToMove[2][i].MoveForward(position);
+                listToMove[2][i].MoveForward(position + offset);
                 i += 1;
             }
+
+            i = 0;
         }
 
         #endregion
