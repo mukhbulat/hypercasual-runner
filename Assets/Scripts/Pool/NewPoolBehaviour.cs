@@ -47,7 +47,7 @@ namespace Pool
             {
                 nextSegment += 1;
                 var temporarySegment = _platformsInSegments.Dequeue();
-                MovePlatforms(temporarySegment, currentSegment * lengthOfSegment);
+                MovePlatforms(temporarySegment, nextSegment * lengthOfSegment);
                 _platformsInSegments.Enqueue(temporarySegment);
             }
         }
@@ -59,7 +59,11 @@ namespace Pool
             for (int i = 0; i < 3; i++)
             {
                 _platformsInSegments.Enqueue(new List<List<IPlatform>>(NumberOfTypesOfPlatforms));
-                InitializePlatforms(_platformsInSegments.Peek());
+            }
+
+            foreach (var list in _platformsInSegments)
+            {
+                InitializePlatforms(list);
             }
         }
         
