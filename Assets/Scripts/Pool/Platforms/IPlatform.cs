@@ -7,5 +7,7 @@ namespace Pool.Platforms
         public IPlatform Initialize(int index);
 
         public int GetPlatformTypeIndex();
+
+        public int GetNumberOfTypesOfPlatforms();
     }
 }

@@ -32,6 +32,11 @@ namespace Pool.Platforms
             return platformTypeIndex;
         }
 
+        public int GetNumberOfTypesOfPlatforms()
+        {
+            return childPrefabs.Count;
+        }
+
         #endregion
 
         private void SetChild(int index)
