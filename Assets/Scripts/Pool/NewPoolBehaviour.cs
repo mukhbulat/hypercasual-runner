@@ -37,6 +37,9 @@ namespace Pool
             var temporaryList = _platformsInSegments.Dequeue();
             MovePlatforms(temporaryList, 0);
             _platformsInSegments.Enqueue(temporaryList);
+            temporaryList = _platformsInSegments.Dequeue();
+            MovePlatforms(temporaryList, 1 * lengthOfSegment);
+            _platformsInSegments.Enqueue(temporaryList);
         }
 
         private void Update()
@@ -50,6 +53,7 @@ namespace Pool
                 MovePlatforms(temporarySegment, nextSegment * lengthOfSegment);
                 _platformsInSegments.Enqueue(temporarySegment);
             }
+            Debug.Log(_platformsInSegments.Count);
         }
 
         #region Platforms
