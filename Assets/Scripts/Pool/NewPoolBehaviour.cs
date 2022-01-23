@@ -53,7 +53,6 @@ namespace Pool
                 MovePlatforms(temporarySegment, nextSegment * lengthOfSegment);
                 _platformsInSegments.Enqueue(temporarySegment);
             }
-            Debug.Log(_platformsInSegments.Count);
         }
 
         #region Platforms
