@@ -30,8 +30,10 @@ namespace Pool
 
         // Collectables fields
         [SerializeField] private GameObject collectablesPrefab;
+        [SerializeField] private int collectablesCapacity = 20;
         private Queue<List<List<ICollectable>>> _collectablesInSegments = new Queue<List<List<ICollectable>>>(3);
 
+        
         private int NumberOfTypesOfCollectables =>
             collectablesPrefab.GetComponent<ICollectable>().GetNumberOfTypesOfCollectables();
         
@@ -41,13 +43,24 @@ namespace Pool
 
         private void Awake()
         {
-            InitializeQueue();
-            var temporaryList = _platformsInSegments.Dequeue();
-            MovePlatforms(temporaryList, 0);
-            _platformsInSegments.Enqueue(temporaryList);
-            temporaryList = _platformsInSegments.Dequeue();
-            MovePlatforms(temporaryList, 1 * lengthOfSegment);
-            _platformsInSegments.Enqueue(temporaryList);
+            //Absolutely fucking same. Need generics or something else.
+            // Platforms
+            InitializePlatformsQueue();
+            var temporaryPlatformsList = _platformsInSegments.Dequeue();
+            MovePlatforms(temporaryPlatformsList, 0);
+            _platformsInSegments.Enqueue(temporaryPlatformsList);
+            temporaryPlatformsList = _platformsInSegments.Dequeue();
+            MovePlatforms(temporaryPlatformsList, 1 * lengthOfSegment);
+            _platformsInSegments.Enqueue(temporaryPlatformsList);
+            
+            // Collectables
+            InitializeCollectableQueue();
+            var temporaryCollectablesList = _collectablesInSegments.Dequeue();
+            MoveCollectables(temporaryCollectablesList, 0);
+            _collectablesInSegments.Enqueue(temporaryCollectablesList);
+            temporaryCollectablesList = _collectablesInSegments.Dequeue();
+            MoveCollectables(temporaryCollectablesList, 1 * lengthOfSegment);
+            _collectablesInSegments.Enqueue(temporaryCollectablesList);
         }
 
         private void Update()
@@ -57,15 +70,19 @@ namespace Pool
             if (currentSegment == nextSegment && modulo > offsetToMoveTheSegment)
             {
                 nextSegment += 1;
-                var temporarySegment = _platformsInSegments.Dequeue();
-                MovePlatforms(temporarySegment, nextSegment * lengthOfSegment);
-                _platformsInSegments.Enqueue(temporarySegment);
+                var temporaryPlatformSegment = _platformsInSegments.Dequeue();
+                MovePlatforms(temporaryPlatformSegment, nextSegment * lengthOfSegment);
+                _platformsInSegments.Enqueue(temporaryPlatformSegment);
+                var temporaryCollectablesSegment = _collectablesInSegments.Dequeue();
+                MoveCollectables(temporaryCollectablesSegment, nextSegment * lengthOfSegment);
+                _collectablesInSegments.Enqueue(temporaryCollectablesSegment);
+
             }
         }
 
         #region Platforms
 
-        private void InitializeQueue()
+        private void InitializePlatformsQueue()
         {
             for (int i = 0; i < 3; i++)
             {
@@ -129,19 +146,46 @@ namespace Pool
 
         #region Collectables
 
-        private void InitializeCoins()
+        private void InitializeCollectableQueue()
+        // Weird. Need to make the same as platforms Queue.
         {
             for (int i = 0; i < 3; i++)
             {
                 _collectablesInSegments.Enqueue(new List<List<ICollectable>>(NumberOfTypesOfCollectables));
             }
 
-            foreach (var list in _platformsInSegments)
+            foreach (var list in _collectablesInSegments)
             {
-                InitializePlatforms(list);
+                InitializeCollectables(list);
             }
         }
 
+        private void InitializeCollectables(List<List<ICollectable>> listToInit)
+        // This is totally can be made with generics.
+        {
+            for (int j = 0; j < NumberOfTypesOfCollectables; j++)
+            {
+                listToInit.Add(new List<ICollectable>());
+                for (int k = 0; k < collectablesCapacity; k++)
+                {
+                    listToInit[j].Add(collectablesPrefab.GetComponent<ICollectable>().Initialize(j));
+                }
+            }
+        }
+
+        private void MoveCollectables(List<List<ICollectable>> listToMove, int zOffset)
+        {
+            // Dummy. Wait to make more segments
+            var levelSegment = levelSegments[0];
+            
+            Vector3 offset = new Vector3(0, 0, zOffset);
+            int i = 0;
+            foreach (var position in levelSegment.Coins)
+            {
+                listToMove[0][i].MoveForward(position + offset);
+                i += 1;
+            }
+        }
         #endregion
     }
 }
