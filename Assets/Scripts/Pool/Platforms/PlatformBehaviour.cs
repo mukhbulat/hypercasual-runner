@@ -6,7 +6,7 @@ namespace Pool.Platforms
     public class PlatformBehaviour : MonoBehaviour, IPlatform
     {
         [SerializeField] private List<GameObject> childPrefabs;
-        private int platformTypeIndex = -1;
+        private int _platformTypeIndex = -1;
             
         #region Interfaces
 
@@ -29,7 +29,7 @@ namespace Pool.Platforms
 
         public int GetPlatformTypeIndex()
         {
-            return platformTypeIndex;
+            return _platformTypeIndex;
         }
 
         public int GetNumberOfTypesOfPlatforms()
@@ -42,7 +42,7 @@ namespace Pool.Platforms
         private void SetChild(int index)
         {
             Instantiate(childPrefabs[index], gameObject.transform);
-            platformTypeIndex = index;
+            _platformTypeIndex = index;
         }
     }
 }

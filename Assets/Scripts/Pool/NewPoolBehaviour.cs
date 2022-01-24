@@ -8,6 +8,10 @@ namespace Pool
     public class NewPoolBehaviour : MonoBehaviour
     {
         #region Fields and properties
+        // Generic fields
+        [SerializeField] private List<LevelSegment> levelSegments;
+        [SerializeField] private int lengthOfSegment = 30;
+        [SerializeField] private int offsetToMoveTheSegment = 10;
         // Player
         [SerializeField] private Transform player;
         private float PlayerZPosition => player.transform.position.z;
@@ -15,10 +19,7 @@ namespace Pool
         // Platforms fields
 
         [SerializeField] private GameObject platformPrefab;
-        [SerializeField] private List<LevelSegment> levelSegments;
         
-        [SerializeField] private int lengthOfSegment = 30;
-        [SerializeField] private int offsetToMoveTheSegment = 10;
         [SerializeField] private int platformsCapacity = 50;
 
         private Queue<List<List<IPlatform>>> _platformsInSegments = new Queue<List<List<IPlatform>>>(3);
@@ -27,6 +28,13 @@ namespace Pool
 
         private int NumberOfTypesOfPlatforms => platformPrefab.GetComponent<IPlatform>().GetNumberOfTypesOfPlatforms();
 
+        // Collectables fields
+        [SerializeField] private GameObject collectablesPrefab;
+        private Queue<List<List<ICollectable>>> _collectablesInSegments = new Queue<List<List<ICollectable>>>(3);
+
+        private int NumberOfTypesOfCollectables =>
+            collectablesPrefab.GetComponent<ICollectable>().GetNumberOfTypesOfCollectables();
+        
         #endregion
 
         //
@@ -115,6 +123,23 @@ namespace Pool
             }
 
             i = 0;
+        }
+
+        #endregion
+
+        #region Collectables
+
+        private void InitializeCoins()
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                _collectablesInSegments.Enqueue(new List<List<ICollectable>>(NumberOfTypesOfCollectables));
+            }
+
+            foreach (var list in _platformsInSegments)
+            {
+                InitializePlatforms(list);
+            }
         }
 
         #endregion

@@ -1,21 +1,25 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
 namespace Pool
 {
-    public class CoinBehaviour : MonoBehaviour, ICollectable, IPoolable
+    public class CoinBehaviour : MonoBehaviour, ICollectable
     {
         
         [SerializeField] private Inventory inventory;
+        [SerializeField] private List<GameObject> prefabs;
+        
+        
 
-        private bool isX2 = false;
+        private bool _isDoubleCoins = false;
         
         #region Interfaces
         
         public void Obtain()
         {
-            if (isX2)
+            if (_isDoubleCoins)
             {
                 inventory.Coins += 2;
             }
@@ -26,9 +30,16 @@ namespace Pool
             transform.position = Vector3.zero;
         }
 
-        public GameObject Initialize()
+        public ICollectable Initialize(int index)
         {
-            return Instantiate(gameObject);
+            GameObject instance = Instantiate(gameObject);
+            instance.GetComponent<CoinBehaviour>().SetChild(index);
+            return instance.GetComponent<ICollectable>();
+        }
+
+        public int GetNumberOfTypesOfCollectables()
+        {
+            return prefabs.Count;
         }
 
         public void MoveForward(Vector3 newPosition)
@@ -43,19 +54,20 @@ namespace Pool
         
         #endregion
 
-        private void OnX2Get()
+        private void OnDoubleCoins(bool isActive)
         {
-            isX2 = true;
+            _isDoubleCoins = isActive;
         }
 
-        private void OnX2Lose()
+        private void SetChild(int index)
         {
-            isX2 = false;
+            Instantiate(prefabs[index], gameObject.transform);
         }
 
         private void Awake()
         {
             inventory = GameObject.FindWithTag("Player").GetComponent<Inventory>();
+            inventory.DoubleCoins += OnDoubleCoins;
         }
 
         private void Update()
