@@ -1,4 +1,4 @@
-namespace Pool
+namespace Pool.Collectables
 {
     public interface ICollectable : IPoolable
     {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Pool.Collectables;
 using Pool.Platforms;
 using UnityEngine;
 

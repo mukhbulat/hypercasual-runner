@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;
 
-namespace Pool
+namespace Pool.Collectables
 {
-    public class CoinBehaviour : MonoBehaviour, ICollectable
+    public class CollectableBehaviour : MonoBehaviour, ICollectable
     {
         
         [SerializeField] private Inventory inventory;
@@ -33,7 +31,7 @@ namespace Pool
         public ICollectable Initialize(int index)
         {
             GameObject instance = Instantiate(gameObject);
-            instance.GetComponent<CoinBehaviour>().SetChild(index);
+            instance.GetComponent<CollectableBehaviour>().SetChild(index);
             return instance.GetComponent<ICollectable>();
         }
 
@@ -75,6 +73,15 @@ namespace Pool
             //double transformX = transform.position.x;
             //transform.DORotate(new Vector3(0, 360, 0), 3);
             //DOTween.To(() => transformX, x => transformX = x, 1.5, 1);
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            Debug.Log("triggered");
+            if (other.GetComponent<Inventory>() != null)
+            {
+                Obtain();
+            }
         }
     }
 }
