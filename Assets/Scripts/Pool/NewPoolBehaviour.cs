@@ -77,7 +77,6 @@ namespace Pool
                 var temporaryCollectablesSegment = _collectablesInSegments.Dequeue();
                 MoveCollectables(temporaryCollectablesSegment, nextSegment * lengthOfSegment);
                 _collectablesInSegments.Enqueue(temporaryCollectablesSegment);
-
             }
         }
 
@@ -183,6 +182,7 @@ namespace Pool
             int i = 0;
             foreach (var position in levelSegment.Coins)
             {
+                // [0] is for coins. Each list in listToMove represents list in levelSegment of certain collectables.
                 listToMove[0][i].MoveForward(position + offset);
                 i += 1;
             }
