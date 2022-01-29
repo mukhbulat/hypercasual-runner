@@ -6,10 +6,8 @@ namespace Pool.Collectables
     public class CollectableBehaviour : MonoBehaviour, ICollectable
     {
         
-        [SerializeField] private Inventory inventory;
         [SerializeField] private List<GameObject> prefabs;
-        
-        
+        private Inventory inventory;
 
         private bool _isDoubleCoins = false;
         
