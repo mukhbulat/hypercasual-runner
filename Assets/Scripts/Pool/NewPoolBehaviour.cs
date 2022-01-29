@@ -16,8 +16,9 @@ namespace Pool
         // Player
         [SerializeField] private Transform player;
         private float PlayerZPosition => player.transform.position.z;
-        
+        #endregion
         // Platforms fields
+        /*
 
         [SerializeField] private GameObject platformPrefab;
         
@@ -40,7 +41,7 @@ namespace Pool
         
         #endregion
 
-        //
+        /*
 
         private void Awake()
         {
@@ -80,6 +81,7 @@ namespace Pool
             }
         }
 
+        
         #region Platforms
 
         private void InitializePlatformsQueue()
@@ -105,7 +107,7 @@ namespace Pool
                 listToInit.Add(new List<IPlatform>(platformsCapacity));
                 for (int k = 0; k < platformsCapacity; k++)
                 {
-                    listToInit[j].Add(platformPrefab.GetComponent<IPlatform>().Initialize(j));
+                    //listToInit[j].Add(platformPrefab.GetComponent<IPlatform>().Initialize(j));
                 }
             }
         }
@@ -168,7 +170,7 @@ namespace Pool
                 listToInit.Add(new List<ICollectable>());
                 for (int k = 0; k < collectablesCapacity; k++)
                 {
-                    listToInit[j].Add(collectablesPrefab.GetComponent<ICollectable>().Initialize(j));
+                   //listToInit[j].Add(collectablesPrefab.GetComponent<ICollectable>().Initialize(j));
                 }
             }
         }
@@ -188,5 +190,6 @@ namespace Pool
             }
         }
         #endregion
+        */
     }
 }

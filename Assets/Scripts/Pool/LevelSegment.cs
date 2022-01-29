@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,9 +7,9 @@ namespace Pool
     [CreateAssetMenu]
     public class LevelSegment : ScriptableObject
     {
-        public List<Vector3> X3Platforms;
-        public List<Vector3> X5Platforms;
-        public List<Vector3> X7Platforms;
-        public List<Vector3> Coins;
+        public ISegment Collectables;
+        public ISegment Platforms;
+
+        public int Length = 30;
     }
 }

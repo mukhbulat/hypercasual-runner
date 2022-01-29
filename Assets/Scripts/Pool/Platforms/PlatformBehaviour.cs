@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Pool.Platforms
 {
-    public class PlatformBehaviour : MonoBehaviour, IPlatform
+    public class PlatformBehaviour : MonoBehaviour, IPoolable
     {
         [SerializeField] private List<GameObject> childPrefabs;
         private int _platformTypeIndex = -1;
@@ -20,23 +20,18 @@ namespace Pool.Platforms
             return transform.position.z;
         }
 
-        public IPlatform Initialize(int index)
+        public IPoolable Initialize(int index)
         {
             GameObject instance = Instantiate(gameObject);
             instance.GetComponent<PlatformBehaviour>().SetChild(index);
-            return instance.GetComponent<IPlatform>();
+            return instance.GetComponent<IPoolable>();
         }
-
-        public int GetPlatformTypeIndex()
-        {
-            return _platformTypeIndex;
-        }
-
-        public int GetNumberOfTypesOfPlatforms()
+        
+        
+        public int GetNumberOfTypesOfThis()
         {
             return childPrefabs.Count;
         }
-
         #endregion
 
         private void SetChild(int index)
