@@ -12,8 +12,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c12a88a2b8b541e8aa87b9c6a2b3a5db, type: 3}
   m_Name: Platforms1
   m_EditorClassIdentifier: 
-  X3Platforms: []
-  X5Platforms: []
-  X7Platforms: []
+  X3Platforms:
+  - {x: 0, y: 6, z: 23}
+  - {x: 0, y: 6, z: 23}
+  - {x: 0, y: 9, z: 28}
+  - {x: 0, y: 12, z: 6}
+  - {x: 0, y: 12, z: 15}
+  - {x: 0, y: 15, z: 12}
+  - {x: 0, y: 15, z: 20}
+  - {x: 0, y: 15, z: 28}
+  - {x: 0, y: 18, z: 5}
+  - {x: 0, y: 18, z: 18}
+  - {x: 0, y: 18, z: 26}
+  X5Platforms:
+  - {x: 0, y: 3, z: 19}
+  - {x: 0, y: 3, z: 28}
+  - {x: 0, y: 6, z: 7}
+  - {x: 0, y: 6, z: 16}
+  - {x: 0, y: 9, z: 11}
+  - {x: 0, y: 9, z: 23}
+  - {x: 0, y: 12, z: 24}
+  X7Platforms:
+  - {x: 0, y: 3, z: 10}
   PlatformTypesCount: 3
   PlatformObjectsCapacity: 20

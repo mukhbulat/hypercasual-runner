@@ -12,8 +12,10 @@ namespace Pool
         [SerializeField] private List<LevelSegment> levelSegments;
         private int LevelSegmentsCount => levelSegments.Count;
 
-        private int _currentSegment = 0;
-        private int _nextSegment = 1;
+        private int _currentSegmentNumber = 0;
+        private int _nextSegmentNumber = 1;
+
+        private LevelSegment _currentSegment;
         
         //Player
         [SerializeField] private Transform player;
@@ -22,18 +24,21 @@ namespace Pool
 
         // Platforms
         [SerializeField] private GameObject platformBehaviourPrefab;
+        
+        // This should be more than max in PlatformsSegments.
         [SerializeField] private int platformsCapacity = 50;
         
-        private Queue<List<List<IPoolable>>> _platformsInSegments = new Queue<List<List<IPoolable>>>(3);
+        private Queue<List<List<IPoolable>>> _platformsQueue = new Queue<List<List<IPoolable>>>(3);
 
         private int NumberOfTypesOfPlatforms =>
             platformBehaviourPrefab.GetComponent<IPoolable>().GetNumberOfTypesOfThis();
         
         // Collectables
         [SerializeField] private GameObject collectableBehaviourPrefab;
-        [SerializeField] private int collectablesCapacity = 20;
         
-        private Queue<List<List<IPoolable>>> _collectablesInSegments = new Queue<List<List<IPoolable>>>(3);
+        // This should be more than max in CollectablesSegments.
+        [SerializeField] private int collectablesCapacity = 20;
+        private Queue<List<List<IPoolable>>> _collectablesQueue = new Queue<List<List<IPoolable>>>(3);
 
         private int NumberOfTypesOfCollectables =>
             collectableBehaviourPrefab.GetComponent<IPoolable>().GetNumberOfTypesOfThis();
@@ -43,6 +48,32 @@ namespace Pool
 
         private void Awake()
         {
+            // Getting two random segments to make first two segments.
+            int i = Random.Range(0, LevelSegmentsCount);
+            var segmentI = levelSegments[i];
+            int j = Random.Range(0, LevelSegmentsCount);
+            var segmentJ = levelSegments[j];
+            
+            // Platforms
+            int platformTypesCount = levelSegments[0].Platforms.GetTypesCount;
+            InitializeQueue(_platformsQueue, platformTypesCount,
+                platformsCapacity, platformBehaviourPrefab);
+            var temporaryPlatformsList = _platformsQueue.Dequeue();
+            MoveObjects(temporaryPlatformsList, 0, segmentI.Platforms, i);
+            _platformsQueue.Enqueue(temporaryPlatformsList);
+            temporaryPlatformsList = _platformsQueue.Dequeue();
+            MoveObjects(temporaryPlatformsList, 1, segmentJ.Platforms, j);
+            
+            // Collectables
+            int collectableTypesCount = levelSegments[0].Collectables.GetTypesCount;
+            InitializeQueue(_collectablesQueue, collectableTypesCount,
+                collectablesCapacity, collectableBehaviourPrefab);
+            var temporaryCollectablesList = _collectablesQueue.Dequeue();
+            MoveObjects(temporaryCollectablesList, 0, segmentI.Collectables, i);
+            _collectablesQueue.Enqueue(temporaryCollectablesList);
+            temporaryCollectablesList = _collectablesQueue.Dequeue();
+            MoveObjects(temporaryCollectablesList, 1, segmentJ.Collectables, j);
+            _collectablesQueue.Enqueue(temporaryCollectablesList);
             
         }
 
@@ -70,6 +101,9 @@ namespace Pool
 
         private void InitializeObjects(List<List<IPoolable>> listToInit, int capacityOfTypes, int capacityOfObjects, GameObject behaviourPrefab)
         {
+            // Double nested loop.
+            // At least it would be in Awake. May be make it coroutine and add yield return null to make it on different
+            // frames?
             for (int j = 0; j < capacityOfTypes; j++)
             {
                 listToInit.Add(new List<IPoolable>(capacityOfObjects));
@@ -80,9 +114,25 @@ namespace Pool
             }
         } 
         
-        private void MoveObjects(List<List<IPoolable>> listToMove, int zOffset, ISegment objectsSegment)
+        private void MoveObjects(List<List<IPoolable>> listToMove, int zOffset, ISegment objectsSegment, int index)
         {
+            Vector3 offset = new Vector3(0, 0,levelSegments[index].Length * zOffset);
+            int i = 0;
+            int j = 0;
             
+            // Nested loop. GetSegmentParts is not a huge array, but still, need to think on it.
+            
+            foreach (var listOfPositions in objectsSegment.GetSegmentParts)
+            {
+                foreach (var position in listOfPositions)
+                {
+                    listToMove[i][j].MoveForward(position + offset);
+                    j += 1;
+                }
+
+                j = 0;
+                i += 1;
+            }
         }
 
         #endregion

@@ -157,10 +157,6 @@ MonoBehaviour:
   lengthOfSegment: 30
   offsetToMoveTheSegment: 10
   player: {fileID: 154500853}
-  platformPrefab: {fileID: 6625376001187727680, guid: a88675e88d7132c36a1e8de2e059748c, type: 3}
-  platformsCapacity: 20
-  collectablesPrefab: {fileID: 3400496388704750581, guid: 18d1e5b4e9574840aaa7620093b190c1, type: 3}
-  collectablesCapacity: 20
 --- !u!4 &2328506
 Transform:
   m_ObjectHideFlags: 0
@@ -202,7 +198,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 154500852}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: 1, z: -20}
+  m_LocalPosition: {x: 1, y: 1, z: -15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1684487257}
@@ -330,8 +326,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 287152877}
-  m_LocalRotation: {x: 0.056419235, y: -0.6322995, z: 0.04625271, w: 0.77128136}
-  m_LocalPosition: {x: 11, y: 2.5, z: -22}
+  m_LocalRotation: {x: 0.05641923, y: -0.6322995, z: 0.046252705, w: 0.77128136}
+  m_LocalPosition: {x: 11, y: 2.5, z: -17}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1138828606}
@@ -603,8 +599,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.056419235, y: -0.6322995, z: 0.04625271, w: 0.77128136}
-  m_LocalPosition: {x: 11, y: 2.5, z: -22}
+  m_LocalRotation: {x: 0.05641923, y: -0.6322995, z: 0.046252705, w: 0.77128136}
+  m_LocalPosition: {x: 11, y: 2.5, z: -17}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
