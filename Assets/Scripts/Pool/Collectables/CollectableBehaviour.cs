@@ -28,7 +28,7 @@ namespace Pool.Collectables
 
         public IPoolable Initialize(int index)
         {
-            GameObject instance = Instantiate(gameObject);
+            GameObject instance = Instantiate(gameObject, new Vector3(0, -10, 0), Quaternion.identity);
             instance.GetComponent<CollectableBehaviour>().SetChild(index);
             return instance.GetComponent<IPoolable>();
         }

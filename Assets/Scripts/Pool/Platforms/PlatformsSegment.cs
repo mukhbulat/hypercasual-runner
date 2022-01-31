@@ -11,22 +11,23 @@ namespace Pool.Platforms
         public List<Vector3> X5Platforms;
         public List<Vector3> X7Platforms;
 
-        public int PlatformTypesCount = 3;
         public int PlatformObjectsCapacity = 20;
         
-        private List<List<Vector3>> SegmentParts;
+        private List<List<Vector3>> _segmentParts;
         private void OnEnable()
         {
-            SegmentParts = new List<List<Vector3>>(PlatformTypesCount)
+            _segmentParts = new List<List<Vector3>>(3)
             {
                 X3Platforms,
                 X5Platforms,
                 X7Platforms
             };
+            Vector3 abraCadabra = Vector3.back;
+            abraCadabra.ToString();
         }
 
-        public List<List<Vector3>> GetSegmentParts => SegmentParts;
-        public int GetTypesCount => PlatformTypesCount;
+        public List<List<Vector3>> GetSegmentParts => _segmentParts;
+        public int GetTypesCount => _segmentParts.Count;
         public int GetObjectsCapacity => PlatformObjectsCapacity;
     }
 }

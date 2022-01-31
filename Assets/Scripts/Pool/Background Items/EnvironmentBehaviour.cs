@@ -6,12 +6,12 @@ namespace Pool.Background_Items
     public class EnvironmentBehaviour : MonoBehaviour, IPoolable
     {
         [SerializeField] private List<GameObject> childPrefabs;
-        [SerializeField] private List<Vector3> positionOffset;
-        [SerializeField] private List<Quaternion> rotationOffset;
-
+        [SerializeField] private Vector3 positionOffset;
+        [SerializeField] private Quaternion rotationOffset;
+        [SerializeField] private GameObject groundPrefab;
+        [SerializeField] private Vector3 groundPositionOffset;
+        [SerializeField] private Quaternion groundRotationOffset;
         #region Interfaces
-
-        
 
         public void MoveForward(Vector3 newPosition)
         {
@@ -25,21 +25,28 @@ namespace Pool.Background_Items
 
         public IPoolable Initialize(int index)
         {
-            throw new System.NotImplementedException();
+            GameObject instance = Instantiate(gameObject, new Vector3(0, -10, 0), Quaternion.identity);
+            instance.GetComponent<EnvironmentBehaviour>().SetChild(index);
+            return instance.GetComponent<IPoolable>();
         }
 
         public int GetNumberOfTypesOfThis()
         {
-            throw new System.NotImplementedException();
+            return childPrefabs.Count;
         }
         
         #endregion
         
-        
         private void SetChild(int index)
         {
-            Instantiate(childPrefabs[index], positionOffset[index], rotationOffset[index], gameObject.transform);
+            if (index == -1)
+            {
+                Instantiate(groundPrefab, groundPositionOffset, groundRotationOffset, gameObject.transform);
+            }
+            else
+            {
+                Instantiate(childPrefabs[index], positionOffset, rotationOffset, gameObject.transform);
+            }
         }
-
     }
 }

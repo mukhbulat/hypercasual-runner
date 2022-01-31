@@ -1,29 +1,29 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Pool.Collectables
+namespace Pool.Background_Items
 {
     [CreateAssetMenu]
-    public class CollectablesSegment : ScriptableObject, ISegment
+    public class EnvironmentsSegment : ScriptableObject, ISegment
     {
-        public List<Vector3> Coins;
+        public List<Vector3> Buildings;
 
-        public int CollectableObjectsCapacity = 20;
-        
         private List<List<Vector3>> _segmentParts;
+
+        public int ObjectsCapacity = 10;
 
         private void OnEnable()
         {
             _segmentParts = new List<List<Vector3>>(1)
             {
-                Coins
+                Buildings
             };
         }
 
 
         public List<List<Vector3>> GetSegmentParts => _segmentParts;
         public int GetTypesCount => _segmentParts.Count;
-        public int GetObjectsCapacity => CollectableObjectsCapacity;
+        public int GetObjectsCapacity => ObjectsCapacity;
     }
 }

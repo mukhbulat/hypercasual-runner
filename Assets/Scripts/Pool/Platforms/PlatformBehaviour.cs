@@ -22,7 +22,7 @@ namespace Pool.Platforms
 
         public IPoolable Initialize(int index)
         {
-            GameObject instance = Instantiate(gameObject);
+            GameObject instance = Instantiate(gameObject, new Vector3(0, -10, 0), Quaternion.identity);
             instance.GetComponent<PlatformBehaviour>().SetChild(index);
             return instance.GetComponent<IPoolable>();
         }
