@@ -12,5 +12,9 @@ namespace Pool
         public CollectablesSegment Collectables;
         public PlatformsSegment Platforms;
         public int Length = 30;
+
+        public GameObject Floor;
+        public Vector3 FloorPosition;
+        public Vector3 FloorRotation;
     }
 }

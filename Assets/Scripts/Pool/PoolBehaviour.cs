@@ -91,8 +91,6 @@ namespace Pool
 
         #endregion
         
-        #region PoolableLists
-
         private IEnumerator MoveObjectsLoop()
         {
             while (PlayerZPosition < 0) yield return null;
@@ -120,11 +118,16 @@ namespace Pool
                         _nextSegment.Collectables, nextSegmentIndex);
                     _collectablesQueue.Enqueue(temporaryCollectablesList);
                     yield return null;
+                    
+                    // Floor
+                    
                 }
 
                 yield return new WaitForSeconds(0.1f);
             }
         }
+        
+        #region PoolableLists
 
         private void InitializeQueue(Queue<List<List<IPoolable>>> queue, int capacityOfTypes,
             int capacityOfObjects, GameObject behaviourPrefab)
@@ -178,6 +181,11 @@ namespace Pool
             }
         }
 
+        private void MoveBackgroundObjects()
+        {
+            
+        }
+        
         #endregion
     }
     
