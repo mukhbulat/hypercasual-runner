@@ -8,7 +8,8 @@ namespace Pool
 {
     public class PoolBehaviour : MonoBehaviour
     {
-    
+        #region FieldsAndProperties
+
         // Generic Fields
         [SerializeField] private List<LevelSegment> levelSegments;
         private int LevelSegmentsCount => levelSegments.Count;
@@ -46,6 +47,7 @@ namespace Pool
             collectableBehaviourPrefab.GetComponent<IPoolable>().GetNumberOfTypesOfThis();
 
 
+        #endregion
         #region UnityFuncs
 
         private void Awake()
@@ -99,8 +101,8 @@ namespace Pool
                 float currentSegmentLength = _currentSegment.Length;
                 _currentSegmentNumber = (int) (PlayerZPosition / currentSegmentLength);
                 float modulo = PlayerZPosition % currentSegmentLength;
-                // If player passed half of current segment, dequeue previous segment and create new one in front.
-                if (_currentSegmentNumber == _nextSegmentNumber && modulo > currentSegmentLength / 2)
+                // If player passed 1/3 of current segment, dequeue previous segment and create new one in front.
+                if (_currentSegmentNumber == _nextSegmentNumber && modulo > currentSegmentLength / 3)
                 {
                     int nextSegmentIndex = Random.Range(0, LevelSegmentsCount);
                     _nextSegment = levelSegments[nextSegmentIndex];
@@ -149,6 +151,7 @@ namespace Pool
                 listToInit.Add(new List<IPoolable>(capacityOfObjects));
                 for (int k = 0; k < capacityOfObjects; k++)
                 {
+                    Debug.Log(j);
                     listToInit[j].Add(behaviourPrefab.GetComponent<IPoolable>().Initialize(j));
                 }
             }
