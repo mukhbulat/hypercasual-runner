@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -7,7 +8,7 @@ namespace Pool
 {
     public class PoolBehaviour : MonoBehaviour
     {
-        
+    
         // Generic Fields
         [SerializeField] private List<LevelSegment> levelSegments;
         private int LevelSegmentsCount => levelSegments.Count;
@@ -16,6 +17,7 @@ namespace Pool
         private int _nextSegmentNumber = 1;
 
         private LevelSegment _currentSegment;
+        private LevelSegment _nextSegment;
         
         //Player
         [SerializeField] private Transform player;
@@ -53,7 +55,9 @@ namespace Pool
             var segmentI = levelSegments[i];
             int j = Random.Range(0, LevelSegmentsCount);
             var segmentJ = levelSegments[j];
-            
+
+            _currentSegment = segmentI;
+            _nextSegment = segmentJ;
             // Platforms
             int platformTypesCount = levelSegments[0].Platforms.GetTypesCount;
             InitializeQueue(_platformsQueue, platformTypesCount,
@@ -77,16 +81,51 @@ namespace Pool
             
         }
 
+        
         private void Update()
         {
-            
+            StartCoroutine(MoveObjectsLoop());
         }
 
         #endregion
         
-        #region IPoolableLists
-        
-        private void InitializeQueue(Queue<List<List<IPoolable>>> queue, int capacityOfTypes, int capacityOfObjects, GameObject behaviourPrefab)
+        #region PoolableLists
+
+        private IEnumerator MoveObjectsLoop()
+        {
+            while (PlayerZPosition < 0) yield return null;
+            while (true)
+            {
+                float currentSegmentLength = _currentSegment.Length;
+                _currentSegmentNumber = (int) (PlayerZPosition / currentSegmentLength);
+                float modulo = PlayerZPosition % currentSegmentLength;
+                // If player passed half of current segment, dequeue previous segment and create new one in front.
+                if (_currentSegmentNumber == _nextSegmentNumber && modulo > currentSegmentLength / 2)
+                {
+                    int nextSegmentIndex = Random.Range(0, LevelSegmentsCount);
+                    _nextSegment = levelSegments[nextSegmentIndex];
+                    _nextSegmentNumber += 1;
+                    
+                    // Platforms
+                    var temporaryPlatformsList = _platformsQueue.Dequeue();
+                    MoveObjects(temporaryPlatformsList, _nextSegmentNumber,
+                        _nextSegment.Platforms, nextSegmentIndex);
+                    _platformsQueue.Enqueue(temporaryPlatformsList);
+                    yield return null;
+                    // Collectables
+                    var temporaryCollectablesList = _collectablesQueue.Dequeue();
+                    MoveObjects(temporaryCollectablesList, _nextSegmentNumber, 
+                        _nextSegment.Collectables, nextSegmentIndex);
+                    _collectablesQueue.Enqueue(temporaryCollectablesList);
+                    yield return null;
+                }
+
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+
+        private void InitializeQueue(Queue<List<List<IPoolable>>> queue, int capacityOfTypes,
+            int capacityOfObjects, GameObject behaviourPrefab)
         {
             for (int i = 0; i < 3; i++)
             {
@@ -99,7 +138,8 @@ namespace Pool
             }
         }
 
-        private void InitializeObjects(List<List<IPoolable>> listToInit, int capacityOfTypes, int capacityOfObjects, GameObject behaviourPrefab)
+        private void InitializeObjects(List<List<IPoolable>> listToInit, int capacityOfTypes, 
+            int capacityOfObjects, GameObject behaviourPrefab)
         {
             // Double nested loop.
             // At least it would be in Awake. May be make it coroutine and add yield return null to make it on different
@@ -120,7 +160,7 @@ namespace Pool
             int i = 0;
             int j = 0;
             
-            // Nested loop. GetSegmentParts is not a huge array, but still, need to think on it.
+            // Nested loop. SegmentParts is small array, but still, need to think on it.
             
             foreach (var listOfPositions in objectsSegment.GetSegmentParts)
             {

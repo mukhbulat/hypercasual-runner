@@ -8,6 +8,7 @@ namespace Pool
 {
     public class NewPoolBehaviour : MonoBehaviour
     {
+        /*
         #region Fields and properties
         // Generic fields
         [SerializeField] private List<LevelSegment> levelSegments;
