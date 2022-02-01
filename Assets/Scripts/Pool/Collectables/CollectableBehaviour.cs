@@ -68,7 +68,6 @@ namespace Pool.Collectables
 
         private void OnTriggerEnter(Collider other)
         {
-            Debug.Log("triggered");
             if (other.GetComponent<Inventory>() != null)
             {
                 Obtain();
