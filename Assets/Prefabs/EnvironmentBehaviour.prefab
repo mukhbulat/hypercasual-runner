@@ -44,7 +44,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   childPrefabs:
-  - {fileID: 0}
-  positionOffset: {x: 0, y: 0, z: 0}
-  rotationOffset: {x: 0, y: 0, z: 0, w: 0}
+  - {fileID: 7601907164322878159, guid: d30936925fd17872a80f21c4944ba92b, type: 3}
+  - {fileID: 3129589843567873396, guid: 58bfc9ddd0281a126a0d16db1167f2d3, type: 3}
+  - {fileID: 2821457027191309710, guid: d486287478b0efd21996fc0f24576487, type: 3}
+  - {fileID: 5522334505470664257, guid: 8e79e1e90c2d7a69b83193b44500ff1b, type: 3}
   groundPrefab: {fileID: 5233223778627108581, guid: b72248561fafd5dd6b221657ef130653, type: 3}

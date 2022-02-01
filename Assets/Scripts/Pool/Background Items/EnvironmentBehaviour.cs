@@ -6,8 +6,6 @@ namespace Pool.Background_Items
     public class EnvironmentBehaviour : MonoBehaviour, IPoolable
     {
         [SerializeField] private List<GameObject> childPrefabs;
-        [SerializeField] private Vector3 positionOffset;
-        [SerializeField] private Quaternion rotationOffset;
         [SerializeField] private GameObject groundPrefab;
         #region Interfaces
 

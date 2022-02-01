@@ -12,5 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 386fffdc8e3c4d668eafdb8b7d7d585f, type: 3}
   m_Name: Enironment1
   m_EditorClassIdentifier: 
-  Buildings: []
+  Building2Small:
+  - {x: 0, y: 0, z: 0}
+  Building3Small:
+  - {x: 0, y: 0, z: 4}
+  Building3Big:
+  - {x: 0, y: 0, z: 9}
+  Building4:
+  - {x: 0, y: 0, z: 12}
   ObjectsCapacity: 10

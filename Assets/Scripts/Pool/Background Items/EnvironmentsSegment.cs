@@ -7,7 +7,11 @@ namespace Pool.Background_Items
     [CreateAssetMenu]
     public class EnvironmentsSegment : ScriptableObject, ISegment
     {
-        public List<Vector3> Buildings;
+        public List<Vector3> Building2Small;
+        public List<Vector3> Building3Small;
+        public List<Vector3> Building3Big;
+        public List<Vector3> Building4;
+
 
         private List<List<Vector3>> _segmentParts;
 
@@ -17,7 +21,10 @@ namespace Pool.Background_Items
         {
             _segmentParts = new List<List<Vector3>>(1)
             {
-                Buildings
+                Building2Small,
+                Building3Small,
+                Building3Big,
+                Building4,
             };
         }
 

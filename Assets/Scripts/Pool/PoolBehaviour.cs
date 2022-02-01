@@ -62,36 +62,35 @@ namespace Pool
         {
             // Getting two random segments to make first two segments.
             int i = Random.Range(0, LevelSegmentsCount);
-            var segmentI = levelSegments[i];
+            var firstSegment = levelSegments[i];
             int j = Random.Range(0, LevelSegmentsCount);
-            var segmentJ = levelSegments[j];
+            var secondSegment = levelSegments[j];
 
-            _currentSegment = segmentI;
-            _nextSegment = segmentJ;
+            // Initializing queues ana making first two segments to appear.
+            _currentSegment = firstSegment;
+            _nextSegment = secondSegment;
             // Platforms
             int platformTypesCount = levelSegments[0].Platforms.GetTypesCount;
             InitializeQueue(_platformsQueue, platformTypesCount,
                 platformsCapacity, platformBehaviourPrefab);
-            var temporaryPlatformsList = _platformsQueue.Dequeue();
-            MoveObjects(temporaryPlatformsList, 0, segmentI.Platforms, i);
-            _platformsQueue.Enqueue(temporaryPlatformsList);
-            temporaryPlatformsList = _platformsQueue.Dequeue();
-            MoveObjects(temporaryPlatformsList, 1, segmentJ.Platforms, j);
+            QueueMixing(_platformsQueue, i, 0, firstSegment.Platforms);
+            QueueMixing(_platformsQueue, j, 1, secondSegment.Platforms);
             
             // Collectables
             int collectableTypesCount = levelSegments[0].Collectables.GetTypesCount;
             InitializeQueue(_collectablesQueue, collectableTypesCount,
                 collectablesCapacity, collectableBehaviourPrefab);
-            var temporaryCollectablesList = _collectablesQueue.Dequeue();
-            MoveObjects(temporaryCollectablesList, 0, segmentI.Collectables, i);
-            _collectablesQueue.Enqueue(temporaryCollectablesList);
-            temporaryCollectablesList = _collectablesQueue.Dequeue();
-            MoveObjects(temporaryCollectablesList, 1, segmentJ.Collectables, j);
-            _collectablesQueue.Enqueue(temporaryCollectablesList);
+            QueueMixing(_collectablesQueue, i, 0, firstSegment.Collectables);
+            QueueMixing(_collectablesQueue, j, 1, secondSegment.Collectables);
             
+            // Environment
+            int environmentTypesCount = levelSegments[0].Environments.GetTypesCount;
+            InitializeQueue(_environmentsQueue, environmentTypesCount,
+                environmentsCapacity, environmentBehaviourPrefab);
+            QueueMixing(_environmentsQueue, i, 0, firstSegment.Environments);
+            QueueMixing(_environmentsQueue, j, 1, secondSegment.Environments);
         }
 
-        
         private void Update()
         {
             StartCoroutine(MoveObjectsLoop());
@@ -107,8 +106,8 @@ namespace Pool
                 float currentSegmentLength = _currentSegment.Length;
                 _currentSegmentNumber = (int) (PlayerZPosition / currentSegmentLength);
                 float modulo = PlayerZPosition % currentSegmentLength;
-                // If player passed 1/3 of current segment, dequeue previous segment and create new one in front.
-                if (_currentSegmentNumber == _nextSegmentNumber && modulo > currentSegmentLength / 3)
+                // If player passed 1/4 of current segment, dequeue previous segment and create new one in front.
+                if (_currentSegmentNumber == _nextSegmentNumber && modulo > currentSegmentLength / 4)
                 {
                     int nextSegmentIndex = Random.Range(0, LevelSegmentsCount);
                     _nextSegment = levelSegments[nextSegmentIndex];
@@ -162,7 +161,6 @@ namespace Pool
                 listToInit.Add(new List<IPoolable>(capacityOfObjects));
                 for (int k = 0; k < capacityOfObjects; k++)
                 {
-                    Debug.Log(j);
                     listToInit[j].Add(behaviourPrefab.GetComponent<IPoolable>().Initialize(j));
                 }
             }
