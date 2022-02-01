@@ -41,11 +41,19 @@ namespace Pool
         
         // This should be more than max in CollectablesSegments.
         [SerializeField] private int collectablesCapacity = 20;
+        
         private Queue<List<List<IPoolable>>> _collectablesQueue = new Queue<List<List<IPoolable>>>(3);
 
         private int NumberOfTypesOfCollectables =>
             collectableBehaviourPrefab.GetComponent<IPoolable>().GetNumberOfTypesOfThis();
 
+        // Environment
+        [SerializeField] private GameObject environmentBehaviourPrefab;
+        
+        // This should be more than max in EnvironmentSegments.
+        [SerializeField] private int environmentsCapacity = 8;
+
+        private Queue<List<List<IPoolable>>> _environmentsQueue = new Queue<List<List<IPoolable>>>(3);
 
         #endregion
         #region UnityFuncs
@@ -106,29 +114,29 @@ namespace Pool
                     _nextSegment = levelSegments[nextSegmentIndex];
                     _nextSegmentNumber += 1;
                     
-                    // Platforms
-                    var temporaryPlatformsList = _platformsQueue.Dequeue();
-                    MoveObjects(temporaryPlatformsList, _nextSegmentNumber,
-                        _nextSegment.Platforms, nextSegmentIndex);
-                    _platformsQueue.Enqueue(temporaryPlatformsList);
+                    QueueMixing(_platformsQueue, nextSegmentIndex, _nextSegmentNumber, _nextSegment.Platforms);
                     yield return null;
-                    // Collectables
-                    var temporaryCollectablesList = _collectablesQueue.Dequeue();
-                    MoveObjects(temporaryCollectablesList, _nextSegmentNumber, 
-                        _nextSegment.Collectables, nextSegmentIndex);
-                    _collectablesQueue.Enqueue(temporaryCollectablesList);
+                    QueueMixing(_collectablesQueue, nextSegmentIndex, _nextSegmentNumber, _nextSegment.Collectables);
                     yield return null;
-                    
-                    // Floor
-                    
+                    QueueMixing(_environmentsQueue, nextSegmentIndex, _nextSegmentNumber, _nextSegment.Environments);
+                    yield return null;
                 }
-
+                
                 yield return new WaitForSeconds(0.1f);
             }
         }
         
         #region PoolableLists
 
+        private void QueueMixing(Queue<List<List<IPoolable>>> initialQueue, int segmentIndex,
+            int segmentNumber, ISegment objectsSegment)
+        // Takes list of objects from queue, changes positions of objects and returns the list in queue.
+        {
+            var temporaryList = initialQueue.Dequeue();
+            MoveObjects(temporaryList, segmentNumber, objectsSegment, segmentIndex);
+            initialQueue.Enqueue(temporaryList);
+        }
+        
         private void InitializeQueue(Queue<List<List<IPoolable>>> queue, int capacityOfTypes,
             int capacityOfObjects, GameObject behaviourPrefab)
         {
@@ -179,11 +187,6 @@ namespace Pool
                 j = 0;
                 i += 1;
             }
-        }
-
-        private void MoveBackgroundObjects()
-        {
-            
         }
         
         #endregion

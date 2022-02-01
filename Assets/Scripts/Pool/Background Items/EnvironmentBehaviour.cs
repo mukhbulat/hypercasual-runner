@@ -9,8 +9,6 @@ namespace Pool.Background_Items
         [SerializeField] private Vector3 positionOffset;
         [SerializeField] private Quaternion rotationOffset;
         [SerializeField] private GameObject groundPrefab;
-        [SerializeField] private Vector3 groundPositionOffset;
-        [SerializeField] private Quaternion groundRotationOffset;
         #region Interfaces
 
         public void MoveForward(Vector3 newPosition)
@@ -41,11 +39,11 @@ namespace Pool.Background_Items
         {
             if (index == -1)
             {
-                Instantiate(groundPrefab, groundPositionOffset, groundRotationOffset, gameObject.transform);
+                Instantiate(groundPrefab, gameObject.transform);
             }
             else
             {
-                Instantiate(childPrefabs[index], positionOffset, rotationOffset, gameObject.transform);
+                Instantiate(childPrefabs[index], gameObject.transform);
             }
         }
     }
