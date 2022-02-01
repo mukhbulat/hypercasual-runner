@@ -6,7 +6,6 @@ namespace Pool.Background_Items
     public class EnvironmentBehaviour : MonoBehaviour, IPoolable
     {
         [SerializeField] private List<GameObject> childPrefabs;
-        [SerializeField] private GameObject groundPrefab;
         #region Interfaces
 
         public void MoveForward(Vector3 newPosition)
@@ -21,7 +20,7 @@ namespace Pool.Background_Items
 
         public IPoolable Initialize(int index)
         {
-            GameObject instance = Instantiate(gameObject, new Vector3(0, -10, 0), Quaternion.identity);
+            GameObject instance = Instantiate(gameObject, new Vector3(0, -30, 0), Quaternion.identity);
             instance.GetComponent<EnvironmentBehaviour>().SetChild(index);
             return instance.GetComponent<IPoolable>();
         }
@@ -35,14 +34,7 @@ namespace Pool.Background_Items
         
         private void SetChild(int index)
         {
-            if (index == -1)
-            {
-                Instantiate(groundPrefab, gameObject.transform);
-            }
-            else
-            {
-                Instantiate(childPrefabs[index], gameObject.transform);
-            }
+            Instantiate(childPrefabs[index], gameObject.transform);
         }
     }
 }

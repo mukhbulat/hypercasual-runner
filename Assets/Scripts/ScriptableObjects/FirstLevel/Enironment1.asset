@@ -14,10 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Building2Small:
   - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 18}
   Building3Small:
-  - {x: 0, y: 0, z: 4}
+  - {x: 0, y: 0, z: 8}
   Building3Big:
-  - {x: 0, y: 0, z: 9}
-  Building4:
-  - {x: 0, y: 0, z: 12}
+  - {x: 0, y: 0, z: 18}
+  Building4: []
+  Ground:
+  - {x: 0, y: 0, z: 0}
   ObjectsCapacity: 10

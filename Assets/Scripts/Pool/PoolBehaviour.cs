@@ -106,8 +106,8 @@ namespace Pool
                 float currentSegmentLength = _currentSegment.Length;
                 _currentSegmentNumber = (int) (PlayerZPosition / currentSegmentLength);
                 float modulo = PlayerZPosition % currentSegmentLength;
-                // If player passed 1/4 of current segment, dequeue previous segment and create new one in front.
-                if (_currentSegmentNumber == _nextSegmentNumber && modulo > currentSegmentLength / 4)
+                // If player passed 1/5 of current segment, dequeue previous segment and create new one in front.
+                if (_currentSegmentNumber == _nextSegmentNumber && modulo > currentSegmentLength / 10)
                 {
                     int nextSegmentIndex = Random.Range(0, LevelSegmentsCount);
                     _nextSegment = levelSegments[nextSegmentIndex];
@@ -120,7 +120,8 @@ namespace Pool
                     QueueMixing(_environmentsQueue, nextSegmentIndex, _nextSegmentNumber, _nextSegment.Environments);
                     yield return null;
                 }
-                
+
+                // For this time changing objects won't be needed and not necessary.
                 yield return new WaitForSeconds(0.1f);
             }
         }
@@ -186,7 +187,11 @@ namespace Pool
                 i += 1;
             }
         }
-        
+
+        private void GroundLoop()
+        {
+            
+        }
         #endregion
     }
     

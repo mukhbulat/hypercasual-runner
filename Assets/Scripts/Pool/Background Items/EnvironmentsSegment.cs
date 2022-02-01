@@ -11,11 +11,11 @@ namespace Pool.Background_Items
         public List<Vector3> Building3Small;
         public List<Vector3> Building3Big;
         public List<Vector3> Building4;
-
+        public List<Vector3> Ground;
 
         private List<List<Vector3>> _segmentParts;
 
-        public int ObjectsCapacity = 10;
+        public int ObjectsCapacity = 3;
 
         private void OnEnable()
         {
@@ -25,6 +25,7 @@ namespace Pool.Background_Items
                 Building3Small,
                 Building3Big,
                 Building4,
+                Ground
             };
         }
 
