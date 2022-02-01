@@ -7,7 +7,7 @@ namespace Pool.Collectables
     {
         
         [SerializeField] private List<GameObject> childPrefabs;
-        private Inventory inventory;
+        private Inventory _inventory;
 
         private bool _isDoubleCoins = false;
         
@@ -17,11 +17,11 @@ namespace Pool.Collectables
         {
             if (_isDoubleCoins)
             {
-                inventory.Coins += 2;
+                _inventory.Coins += 2;
             }
             else
             {
-                inventory.Coins += 1;
+                _inventory.Coins += 1;
             }
             transform.position = Vector3.zero;
         }
@@ -62,8 +62,9 @@ namespace Pool.Collectables
 
         private void Awake()
         {
-            inventory = GameObject.FindWithTag("Player").GetComponent<Inventory>();
-            inventory.DoubleCoins += OnDoubleCoins;
+            // Because I need reference of inventory in this script anyway, I think, it's better to use event.
+            _inventory = GameObject.FindWithTag("Player").GetComponent<Inventory>();
+            _inventory.DoubleCoins += OnDoubleCoins;
         }
 
         private void OnTriggerEnter(Collider other)
