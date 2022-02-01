@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 386fffdc8e3c4d668eafdb8b7d7d585f, type: 3}
+  m_Name: Enironment1
+  m_EditorClassIdentifier: 
+  Building2Small:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 18}
+  Building3Small:
+  - {x: 0, y: 0, z: 8}
+  Building3Big:
+  - {x: 0, y: 0, z: 18}
+  Building4: []
+  Ground:
+  - {x: 0, y: 0, z: 0}
+  ObjectsCapacity: 10

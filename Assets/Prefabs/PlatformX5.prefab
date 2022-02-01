@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 6467294299640937105}
   - component: {fileID: 6467294299640937104}
   - component: {fileID: 6467294299640937107}
-  - component: {fileID: 1449622724447455447}
   m_Layer: 0
   m_Name: PlatformX5
   m_TagString: Untagged
@@ -314,15 +313,3 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
---- !u!114 &1449622724447455447
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6467294299640937106}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1abb484661b04d62840de8bd23fecb6d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

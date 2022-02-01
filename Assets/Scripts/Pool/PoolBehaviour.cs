@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,179 +9,190 @@ namespace Pool
     public class PoolBehaviour : MonoBehaviour
     {
         #region FieldsAndProperties
+
+        // Generic Fields
+        [SerializeField] private List<LevelSegment> levelSegments;
+        private int LevelSegmentsCount => levelSegments.Count;
+
+        private int _currentSegmentNumber = 0;
+        private int _nextSegmentNumber = 1;
+
+        private LevelSegment _currentSegment;
+        private LevelSegment _nextSegment;
         
-        // The Only thing I know for real about Player. 
-        [SerializeField] private Transform playerTransform;
-        private float PlayerZPosition => playerTransform.transform.position.z;
-        
-        // General fields
-        [SerializeField] private float zOffsetBack = 10f;
-        [SerializeField] private float zOffsetForward = 20f;
+        //Player
+        [SerializeField] private Transform player;
+        private float PlayerZPosition => player.transform.position.z;
+
 
         // Platforms
-        // Platforms Serialized Fields.
-        [SerializeField] private List<GameObject> platformPrefabs;
-        [SerializeField] private List<LevelSegment> levelSegments;
-
-        [SerializeField] private int platformsListsCapacity = 20;
-        [SerializeField] private float floorToPlatformLengthRatio = 2;
-        // The less - the easier.
-        [SerializeField] private float timeToSpawnPlatform = 0.2f;
-        [SerializeField] private int heightBetweenPlatforms = 3;
-        [SerializeField] private int distanceBetweenPlatforms = 8;
-        [SerializeField] private int zMaxRandomOffset = 4;
-        [SerializeField] private int floorHeight = 12;
+        [SerializeField] private GameObject platformBehaviourPrefab;
         
-        // Platform private fields.
-        private List<IPoolable> _platformsOnFirstFloor;
-        private List<IPoolable> _platformsOnSecondFloor;
-        private List<IPoolable> _platformsOnThirdFloor;
+        // This should be more than max in PlatformsSegments.
+        [SerializeField] private int platformsCapacity = 50;
         
-        // Coins
-        // Coins Serialized Fields.
-        [SerializeField] private GameObject coinPrefab;
-        [SerializeField] private int[] coinsCapacity = {20, 30, 40};
-        [SerializeField] private float timeToSpawnCoin = 0.1f;
+        private Queue<List<List<IPoolable>>> _platformsQueue = new Queue<List<List<IPoolable>>>(3);
 
-        // Coins private fields.
-        private List<IPoolable> _coinsOnFirstFloor;
-        private List<IPoolable> _coinsOnSecondFloor;
-        private List<IPoolable> _coinsOnThirdFloor;
+        private int NumberOfTypesOfPlatforms =>
+            platformBehaviourPrefab.GetComponent<IPoolable>().GetNumberOfTypesOfThis();
+        
+        // Collectables
+        [SerializeField] private GameObject collectableBehaviourPrefab;
+        
+        // This should be more than max in CollectablesSegments.
+        [SerializeField] private int collectablesCapacity = 20;
+        
+        private Queue<List<List<IPoolable>>> _collectablesQueue = new Queue<List<List<IPoolable>>>(3);
+
+        private int NumberOfTypesOfCollectables =>
+            collectableBehaviourPrefab.GetComponent<IPoolable>().GetNumberOfTypesOfThis();
+
+        // Environment
+        [SerializeField] private GameObject environmentBehaviourPrefab;
+        
+        // This should be more than max in EnvironmentSegments.
+        [SerializeField] private int environmentsCapacity = 8;
+
+        private Queue<List<List<IPoolable>>> _environmentsQueue = new Queue<List<List<IPoolable>>>(3);
 
         #endregion
-        
+        #region UnityFuncs
+
         private void Awake()
         {
-            // Would lag at awake. May be coroutine for three initializes?
+            // Getting two random segments to make first two segments.
+            int i = Random.Range(0, LevelSegmentsCount);
+            var firstSegment = levelSegments[i];
+            int j = Random.Range(0, LevelSegmentsCount);
+            var secondSegment = levelSegments[j];
+
+            // Initializing queues ana making first two segments to appear.
+            _currentSegment = firstSegment;
+            _nextSegment = secondSegment;
             // Platforms
-            _platformsOnFirstFloor = new List<IPoolable>(platformsListsCapacity);
-            _platformsOnSecondFloor = new List<IPoolable>(platformsListsCapacity);
-            _platformsOnThirdFloor = new List<IPoolable>(platformsListsCapacity);
-            InitializePlatforms(_platformsOnFirstFloor, 1);
-            InitializePlatforms(_platformsOnSecondFloor, 2);
-            InitializePlatforms(_platformsOnThirdFloor, 3);
-            // Coins
-            _coinsOnFirstFloor = new List<IPoolable>(coinsCapacity[0]);
-            _coinsOnSecondFloor = new List<IPoolable>(coinsCapacity[1]);
-            _coinsOnThirdFloor = new List<IPoolable>(coinsCapacity[2]);
-            InitializeCoins(_coinsOnFirstFloor, 1);
-            InitializeCoins(_coinsOnSecondFloor, 2);
-            InitializeCoins(_coinsOnThirdFloor, 3);
+            int platformTypesCount = levelSegments[0].Platforms.GetTypesCount;
+            InitializeQueue(_platformsQueue, platformTypesCount,
+                platformsCapacity, platformBehaviourPrefab);
+            QueueMixing(_platformsQueue, i, 0, firstSegment.Platforms);
+            QueueMixing(_platformsQueue, j, 1, secondSegment.Platforms);
             
+            // Collectables
+            int collectableTypesCount = levelSegments[0].Collectables.GetTypesCount;
+            InitializeQueue(_collectablesQueue, collectableTypesCount,
+                collectablesCapacity, collectableBehaviourPrefab);
+            QueueMixing(_collectablesQueue, i, 0, firstSegment.Collectables);
+            QueueMixing(_collectablesQueue, j, 1, secondSegment.Collectables);
+            
+            // Environment
+            int environmentTypesCount = levelSegments[0].Environments.GetTypesCount;
+            InitializeQueue(_environmentsQueue, environmentTypesCount,
+                environmentsCapacity, environmentBehaviourPrefab);
+            QueueMixing(_environmentsQueue, i, 0, firstSegment.Environments);
+            QueueMixing(_environmentsQueue, j, 1, secondSegment.Environments);
         }
 
         private void Update()
         {
-            StartCoroutine(MovePlatformsForward(_platformsOnFirstFloor, 1));
-        }
-
-        private void InitializeCoins(List<IPoolable> listToInitialize, int floor)
-        { 
-            for (int i = 0; i < coinsCapacity[floor - 1]; i++)
-            {
-                listToInitialize.Add(coinPrefab.GetComponent<IPoolable>().Initialize().GetComponent<IPoolable>());
-            }
-        }
-
-        private IEnumerator MoveCoinsForward(List<IPoolable> coins, int floor)
-        {
-            for (int i = 0; i < floor; i++)
-            {
-                yield return null;
-            }
-
-            while (true)
-            {
-                foreach (var coin in coins)
-                {
-                    if (coin.GetZPosition() < PlayerZPosition - zOffsetBack)
-                    {
-                        coin.MoveForward(FindNewPositionForCoin(floor));
-                    }
-
-                    yield return null;
-                }
-
-                yield return null;
-            }
-        }
-
-        private Vector3 FindNewPositionForCoin(int floor)
-        {
-            // TODO finding new position on platform. May be easier to remake platform positioning first.
-            return Vector3.zero;
-        }
-        
-        #region Platforms
-        
-        private void InitializePlatforms(List<IPoolable> listToInitialize, int floor)
-        {
-            float randomLengthRatio = 1 / (floor * floorToPlatformLengthRatio);
-            for (int i = 0; i < platformsListsCapacity; i ++)
-            {
-                // Bad! Could be worse.
-                // At least this is not in update.
-                if (Random.value < randomLengthRatio)
-                {
-                    listToInitialize.Add(platformPrefabs[0].GetComponent<IPoolable>().Initialize().GetComponent<IPoolable>());
-                }
-                else if (Random.value < randomLengthRatio)
-                {
-                    listToInitialize.Add(platformPrefabs[1].GetComponent<IPoolable>().Initialize().GetComponent<IPoolable>());
-                }
-                else 
-                {
-                    listToInitialize.Add(platformPrefabs[2].GetComponent<IPoolable>().Initialize().GetComponent<IPoolable>());
-                }
-            }
-        }
-
-        private IEnumerator MovePlatformsForward(List<IPoolable> platforms, int floor)
-        {
-            for (int i = 0; i < floor; i++)
-            {
-                yield return null;
-            }
-            while (true)
-            {
-                foreach (var platform in platforms)
-                {
-                    if (platform.GetZPosition() < PlayerZPosition - zOffsetBack)
-                    {
-                        platform.MoveForward(FindNewPositionForPlatform(floor));
-                    }
-
-                    yield return null;
-                }
-                yield return new WaitForSeconds(timeToSpawnPlatform);
-            }
-        }
-
-        private Vector3 FindNewPositionForPlatform(int floor)
-        // The whole system shouldn't be random. I need to draw like 10 variations for each floor
-        // and randomly select one of them for the next sector of the gameplay.
-        // So, the whole method is dummy for the later system. Event the whole class.
-        {
-            int maxY = floor * floorHeight;
-            int minY = (floor - 1) * floorHeight;
-            int yMaxRandomOffset = maxY / heightBetweenPlatforms - 1;
-            int zCurrentRandomOffset = Random.Range(1, zMaxRandomOffset) * distanceBetweenPlatforms;
-            int yCurrentRandomOffset = Random.Range(minY + 1, yMaxRandomOffset + 1);
-            yCurrentRandomOffset = yCurrentRandomOffset * heightBetweenPlatforms + minY + yCurrentRandomOffset - 1;
-            if (yCurrentRandomOffset > maxY) throw new Exception($"What the fuck {yCurrentRandomOffset}");
-            return new Vector3(0, yCurrentRandomOffset, PlayerZPosition + zOffsetForward + zCurrentRandomOffset);
-        }
-
-        private void PositionPlatforms()
-        {
-            // Dummy. Make random after couple of segments
-            var levelSegment = levelSegments[0];
-                foreach (var VARIABLE in levelSegment.X3Platforms)
-                {
-                    
-                }
+            StartCoroutine(MoveObjectsLoop());
         }
 
         #endregion
+        
+        private IEnumerator MoveObjectsLoop()
+        {
+            while (PlayerZPosition < 0) yield return null;
+            while (true)
+            {
+                float currentSegmentLength = _currentSegment.Length;
+                _currentSegmentNumber = (int) (PlayerZPosition / currentSegmentLength);
+                float modulo = PlayerZPosition % currentSegmentLength;
+                // If player passed 1/5 of current segment, dequeue previous segment and create new one in front.
+                if (_currentSegmentNumber == _nextSegmentNumber && modulo > currentSegmentLength / 10)
+                {
+                    int nextSegmentIndex = Random.Range(0, LevelSegmentsCount);
+                    _nextSegment = levelSegments[nextSegmentIndex];
+                    _nextSegmentNumber += 1;
+                    
+                    QueueMixing(_platformsQueue, nextSegmentIndex, _nextSegmentNumber, _nextSegment.Platforms);
+                    yield return null;
+                    QueueMixing(_collectablesQueue, nextSegmentIndex, _nextSegmentNumber, _nextSegment.Collectables);
+                    yield return null;
+                    QueueMixing(_environmentsQueue, nextSegmentIndex, _nextSegmentNumber, _nextSegment.Environments);
+                    yield return null;
+                }
+
+                // For this time changing objects won't be needed and not necessary.
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+        
+        #region PoolableLists
+
+        private void QueueMixing(Queue<List<List<IPoolable>>> initialQueue, int segmentIndex,
+            int segmentNumber, ISegment objectsSegment)
+        // Takes list of objects from queue, changes positions of objects and returns the list in queue.
+        {
+            var temporaryList = initialQueue.Dequeue();
+            MoveObjects(temporaryList, segmentNumber, objectsSegment, segmentIndex);
+            initialQueue.Enqueue(temporaryList);
+        }
+        
+        private void InitializeQueue(Queue<List<List<IPoolable>>> queue, int capacityOfTypes,
+            int capacityOfObjects, GameObject behaviourPrefab)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                queue.Enqueue(new List<List<IPoolable>>(capacityOfTypes));
+            }
+
+            foreach (var list in queue)
+            {
+                InitializeObjects(list, capacityOfTypes, capacityOfObjects, behaviourPrefab);
+            }
+        }
+
+        private void InitializeObjects(List<List<IPoolable>> listToInit, int capacityOfTypes, 
+            int capacityOfObjects, GameObject behaviourPrefab)
+        {
+            // Double nested loop.
+            // At least it would be in Awake. May be make it coroutine and add yield return null to make it on different
+            // frames?
+            for (int j = 0; j < capacityOfTypes; j++)
+            {
+                listToInit.Add(new List<IPoolable>(capacityOfObjects));
+                for (int k = 0; k < capacityOfObjects; k++)
+                {
+                    listToInit[j].Add(behaviourPrefab.GetComponent<IPoolable>().Initialize(j));
+                }
+            }
+        } 
+        
+        private void MoveObjects(List<List<IPoolable>> listToMove, int zOffset, ISegment objectsSegment, int index)
+        {
+            Vector3 offset = new Vector3(0, 0,levelSegments[index].Length * zOffset);
+            int i = 0;
+            int j = 0;
+            
+            // Nested loop. SegmentParts is small array, but still, need to think on it.
+            
+            foreach (var listOfPositions in objectsSegment.GetSegmentParts)
+            {
+                foreach (var position in listOfPositions)
+                {
+                    listToMove[i][j].MoveForward(position + offset);
+                    j += 1;
+                }
+
+                j = 0;
+                i += 1;
+            }
+        }
+
+        private void GroundLoop()
+        {
+            
+        }
+        #endregion
     }
+    
 }
