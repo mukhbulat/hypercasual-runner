@@ -89,12 +89,10 @@ namespace Pool
                 environmentsCapacity, environmentBehaviourPrefab);
             QueueMixing(_environmentsQueue, i, 0, firstSegment.Environments);
             QueueMixing(_environmentsQueue, j, 1, secondSegment.Environments);
-        }
-
-        private void Update()
-        {
+            
             StartCoroutine(MoveObjectsLoop());
         }
+
 
         #endregion
         
@@ -121,7 +119,7 @@ namespace Pool
                     yield return null;
                 }
 
-                // For this time changing objects won't be needed and not necessary.
+                // For this time changing objects won't be needed and not necessary anyway.
                 yield return new WaitForSeconds(0.1f);
             }
         }
@@ -188,10 +186,6 @@ namespace Pool
             }
         }
 
-        private void GroundLoop()
-        {
-            
-        }
         #endregion
     }
     

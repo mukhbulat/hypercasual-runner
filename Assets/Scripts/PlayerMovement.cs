@@ -1,24 +1,24 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private CharacterController characterController;
-    [SerializeField] private Animator _animator;
+    [SerializeField] private Animator animator;
     
-    private static readonly int VerticalVelocity = Animator.StringToHash("VerticalVelocity");
-    
-    private float _animationSpeed;
-    //
-    private readonly float _speed = 7f;
-    private readonly float _acceleration = 0.1f;
-    private readonly float _gravity = -20.8f;
-    [SerializeField] private float _jumpHeight = 12f;
+    [SerializeField] private float jumpHeight = 6f;
     [SerializeField] private AnimationCurve speedIncrease;
     [SerializeField] private AnimationCurve speedAtMaxSpeed;
+    [SerializeField] private float timeToGetFullSpeed = 60f;
+    [SerializeField] private float timeOfMaxSpeedLoop = 10f;
+    //
+    private static readonly int VerticalVelocity = Animator.StringToHash("VerticalVelocity");
     
+    private readonly float _speed = 15f;
+    private float _acceleration;
+    private readonly float _gravity = -20.8f;
+    private float _currentTime;
     
     private float _yVelocity;
     private bool _isGrounded;
@@ -31,10 +31,10 @@ public class PlayerMovement : MonoBehaviour
         {
             _yVelocity = 0;
         }
-        characterController.Move(Vector3.forward * _speed * Time.deltaTime);
+        characterController.Move(Vector3.forward * _speed * _acceleration * Time.deltaTime);
         if (_isGrounded && Input.GetMouseButtonDown(0))
         {
-            _yVelocity += Mathf.Sqrt(_jumpHeight * -1 * _gravity);
+            _yVelocity += Mathf.Sqrt(jumpHeight * -1 * _gravity);
         }
 
         _yVelocity += _gravity * Time.deltaTime;
@@ -46,15 +46,50 @@ public class PlayerMovement : MonoBehaviour
     {
         if (_isGrounded)
         {
-            _animator.SetFloat(VerticalVelocity, 0.5f);
+            animator.SetFloat(VerticalVelocity, 0.5f);
         }
         else if (_yVelocity > 0.1f)
         {
-            _animator.SetFloat(VerticalVelocity, 1f);
+            animator.SetFloat(VerticalVelocity, 1f);
         }
         else
         {
-            _animator.SetFloat(VerticalVelocity, 0f);
+            animator.SetFloat(VerticalVelocity, 0f);
+        }
+    }
+
+    private void Awake()
+    {
+        _acceleration = speedIncrease.Evaluate(0);
+        StartCoroutine(AcceleratingToMaxSpeed());
+    }
+
+    private IEnumerator AcceleratingToMaxSpeed()
+    {
+        while (_currentTime < timeToGetFullSpeed)
+        {
+            _currentTime += Time.deltaTime;
+            _acceleration = speedIncrease.Evaluate(_currentTime / timeToGetFullSpeed);
+            yield return null;
+        }
+
+        _currentTime = 0;
+        StartCoroutine(SpeedChangeOnMaxSpeed());
+    }
+
+    private IEnumerator SpeedChangeOnMaxSpeed()
+    {
+        while (true)
+        {
+            _currentTime += Time.deltaTime;
+            if (_currentTime > timeOfMaxSpeedLoop)
+            {
+                _currentTime -= timeOfMaxSpeedLoop;
+            }
+
+            _acceleration = speedAtMaxSpeed.Evaluate(_currentTime / timeOfMaxSpeedLoop);
+
+            yield return null;
         }
     }
 }
