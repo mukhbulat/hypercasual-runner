@@ -105,7 +105,7 @@ namespace Pool
                 _currentSegmentNumber = (int) (PlayerZPosition / currentSegmentLength);
                 float modulo = PlayerZPosition % currentSegmentLength;
                 // If player passed 1/5 of current segment, dequeue previous segment and create new one in front.
-                if (_currentSegmentNumber == _nextSegmentNumber && modulo > currentSegmentLength / 10)
+                if (_currentSegmentNumber == _nextSegmentNumber && modulo > currentSegmentLength / 20)
                 {
                     int nextSegmentIndex = Random.Range(0, LevelSegmentsCount);
                     _nextSegment = levelSegments[nextSegmentIndex];
@@ -120,7 +120,7 @@ namespace Pool
                 }
 
                 // For this time changing objects won't be needed and not necessary anyway.
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.05f);
             }
         }
         

@@ -23,23 +23,58 @@ public class PlayerMovement : MonoBehaviour
     private float _yVelocity;
     private bool _isGrounded;
 
+    // Obstacles bypassing
+    
     private void Update()
     {
         _isGrounded = characterController.isGrounded;
+        
         
         if (_isGrounded && _yVelocity < 0)
         {
             _yVelocity = 0;
         }
+        
+        // Moving forward with given speed and acceleration
         characterController.Move(Vector3.forward * _speed * _acceleration * Time.deltaTime);
+        
+        Jump();
+        
+        HandleObstacleBypass();
+
+        VerticalMoving();
+        
+        HandleAnimator();
+    }
+
+    private void Jump()
+    {
         if (_isGrounded && Input.GetMouseButtonDown(0))
         {
             _yVelocity += Mathf.Sqrt(jumpHeight * -1 * _gravity);
         }
 
+    }
+
+    private void VerticalMoving()
+    {
+        
         _yVelocity += _gravity * Time.deltaTime;
         characterController.Move(new Vector3(0, _yVelocity * Time.deltaTime, 0));
-        HandleAnimator();
+
+    }
+    
+    private void HandleObstacleBypass()
+    {
+        RaycastHit hit;
+        
+        if (!_isGrounded)
+        {
+            if (Physics.Raycast(transform.position, transform.forward, out hit, 1))
+            {
+                Debug.Log("Fine");
+            }
+        }
     }
 
     private void HandleAnimator()
