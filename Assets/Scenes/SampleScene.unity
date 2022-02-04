@@ -187,6 +187,7 @@ GameObject:
   - component: {fileID: 154500854}
   - component: {fileID: 154500855}
   - component: {fileID: 154500856}
+  - component: {fileID: 154500857}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -241,6 +242,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterController: {fileID: 154500854}
   animator: {fileID: 178400526}
+  playerHealth: {fileID: 154500857}
   jumpHeight: 6
   speedIncrease:
     serializedVersion: 2
@@ -367,6 +369,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 042f6525ce4245098ac95beb9866a150, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &154500857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 154500852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 063f276915584339b211862ff6a0efac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  regenerationTime: 5
+  health: 3
 --- !u!95 &178400526 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: a7453529bd855950d8bf44d81c694c1d, type: 3}

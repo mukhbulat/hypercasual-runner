@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private CharacterController characterController;
     [SerializeField] private Animator animator;
+    [SerializeField] private PlayerHealth playerHealth;
     
     [SerializeField] private float jumpHeight = 6f;
     [SerializeField] private AnimationCurve speedIncrease;
@@ -14,7 +15,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float timeOfMaxSpeedLoop = 10f;
     //
     private static readonly int VerticalVelocity = Animator.StringToHash("VerticalVelocity");
-    
+    private static readonly int StumbleTrigger = Animator.StringToHash("StumbleTrigger");
+    //
     private readonly float _speed = 15f;
     private float _acceleration;
     private readonly float _gravity = -20.8f;
@@ -24,7 +26,11 @@ public class PlayerMovement : MonoBehaviour
     private bool _isGrounded;
 
     // Obstacles bypassing
-    
+    // Local origin of ray. 1.8 is the height of a character. 0.5 - radius of a character, so it's slightly larger.
+
+    private readonly float _playerHeight = 1.8f;
+    private Vector3 _rayOffset;
+
     private void Update()
     {
         _isGrounded = characterController.isGrounded;
@@ -66,13 +72,52 @@ public class PlayerMovement : MonoBehaviour
     
     private void HandleObstacleBypass()
     {
-        RaycastHit hit;
+        Debug.DrawRay(transform.position + _rayOffset, Vector3.down * 2);
         
         if (!_isGrounded)
         {
-            if (Physics.Raycast(transform.position, transform.forward, out hit, 1))
+            RaycastHit hit;
+            Ray ray = new Ray(transform.position + _rayOffset, Vector3.down);
+            
+            if (Physics.Raycast(ray, out hit, _playerHeight))
             {
-                Debug.Log("Fine");
+                animator.SetTrigger(StumbleTrigger);
+                float distance = hit.distance;
+                // Check the hit distance and respond accordingly
+                if (distance > _playerHeight / 2)
+                {
+                    if (distance > _playerHeight * 3 / 4)
+                    {
+                        if (distance < _playerHeight * 9 / 10)
+                        {
+                            // Move a bit lower and take 1 damage.
+                            playerHealth.Health -= 1;
+                            
+                        }
+                        
+                    }
+                    else
+                    {
+                        // Move lower and take 2 damage.
+                        playerHealth.Health -= 2;
+                    }
+                }
+                else
+                {   
+                    if (distance > _playerHeight / 4)
+                    {
+                        // Move higher and take 2 damage.
+                        playerHealth.Health -= 2;
+                    }
+                    else
+                    {
+                        if (distance > _playerHeight * 9 / 10)
+                        {
+                            // Move a bit higher and take 1 damage.
+                            playerHealth.Health -= 1;                            
+                        }
+                    }
+                }
             }
         }
     }
@@ -95,7 +140,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void Awake()
     {
+        _rayOffset = new Vector3(0, _playerHeight, 0.6f);
+        
         _acceleration = speedIncrease.Evaluate(0);
+        
         StartCoroutine(AcceleratingToMaxSpeed());
     }
 
