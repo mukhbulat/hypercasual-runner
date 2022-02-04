@@ -1,12 +1,13 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private CharacterController characterController;
     [SerializeField] private Animator animator;
-    [SerializeField] private PlayerHealth playerHealth;
+    [SerializeField] private PlayerStats playerStats;
     
     [SerializeField] private float jumpHeight = 6f;
     [SerializeField] private AnimationCurve speedIncrease;
@@ -30,6 +31,9 @@ public class PlayerMovement : MonoBehaviour
 
     private readonly float _playerHeight = 1.8f;
     private Vector3 _rayOffset;
+
+    // Ratio on how strongly stumble will influence _yVelocity.
+    private float _stumbleDistanceToVelocity = 1f;
 
     private void Update()
     {
@@ -72,8 +76,6 @@ public class PlayerMovement : MonoBehaviour
     
     private void HandleObstacleBypass()
     {
-        Debug.DrawRay(transform.position + _rayOffset, Vector3.down * 2);
-        
         if (!_isGrounded)
         {
             RaycastHit hit;
@@ -81,43 +83,27 @@ public class PlayerMovement : MonoBehaviour
             
             if (Physics.Raycast(ray, out hit, _playerHeight))
             {
-                animator.SetTrigger(StumbleTrigger);
-                float distance = hit.distance;
+                float distance = hit.distance - _playerHeight / 2;
                 // Check the hit distance and respond accordingly
-                if (distance > _playerHeight / 2)
+                if (Mathf.Abs(distance) < 0.25f * _playerHeight)
                 {
-                    if (distance > _playerHeight * 3 / 4)
-                    {
-                        if (distance < _playerHeight * 9 / 10)
-                        {
-                            // Move a bit lower and take 1 damage.
-                            playerHealth.Health -= 1;
-                            
-                        }
-                        
-                    }
-                    else
-                    {
-                        // Move lower and take 2 damage.
-                        playerHealth.Health -= 2;
-                    }
+                    animator.SetTrigger(StumbleTrigger);
+                    
+                    playerStats.Health -= 2;
+                    _yVelocity += distance * _stumbleDistanceToVelocity;
+                }
+                else if (Mathf.Abs(distance) < 0.35f * _playerHeight)
+                {
+                    animator.SetTrigger(StumbleTrigger);
+                    
+                    playerStats.Health -= 1;
+                    _yVelocity += distance * _stumbleDistanceToVelocity;
                 }
                 else
-                {   
-                    if (distance > _playerHeight / 4)
-                    {
-                        // Move higher and take 2 damage.
-                        playerHealth.Health -= 2;
-                    }
-                    else
-                    {
-                        if (distance > _playerHeight * 9 / 10)
-                        {
-                            // Move a bit higher and take 1 damage.
-                            playerHealth.Health -= 1;                            
-                        }
-                    }
+                {
+                    _yVelocity += distance * _stumbleDistanceToVelocity;
                 }
+                
             }
         }
     }

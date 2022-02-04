@@ -1,13 +1,16 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerHealth : MonoBehaviour
+public class PlayerStats : MonoBehaviour
 {
+    // Health
     [SerializeField] private float regenerationTime = 5.0f;
     [SerializeField] private int maxHealth = 3;
     [SerializeField] private float invulnerabilityTime = 0.1f;
-
+    public event Action<int> HealthChange;
+    
     private int _health;
     private bool _isInvulnerable = false;
     public int Health
@@ -15,6 +18,10 @@ public class PlayerHealth : MonoBehaviour
         get => _health;
         set
         {
+            if (_isInvulnerable) return;
+            
+            HealthChange?.Invoke(value);
+            
             if (value < _health && !_isInvulnerable)
             {
                 StartCoroutine(InvulnerabilityStart());
@@ -22,6 +29,7 @@ public class PlayerHealth : MonoBehaviour
                 StopCoroutine(HealthRegeneration());
                 StartCoroutine(HealthRegeneration());
             }
+
             _health = value;
             Debug.Log($"Health is {_health}");
             if (_health <= 0)
@@ -31,9 +39,20 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
+    // Score
+    public Vector3 PlayerPosition => transform.position;
+
+    private int _scoreMultiplier = 1;
+    private int _score = 0;
+
+    
+    public int ScoreMultiplier => -_scoreMultiplier;
+    public int Score => _score;
+    
     private void Awake()
     {
         _health = maxHealth;
+        _score = 0;
     }
 
     private void Die()
@@ -56,5 +75,25 @@ public class PlayerHealth : MonoBehaviour
         _isInvulnerable = true;
         yield return new WaitForSeconds(invulnerabilityTime);
         _isInvulnerable = false;
+    }
+
+    private void ScoreHandler()
+    {
+        if (PlayerPosition.y < 20)
+        {
+            _scoreMultiplier = 1;
+        }
+        else if (PlayerPosition.y < 40)
+        {
+            _scoreMultiplier = 2;
+        }
+        else
+        {
+            _scoreMultiplier = 3;
+        }
+
+        _score = (int) PlayerPosition.y * _scoreMultiplier;
+        
+        
     }
 }
