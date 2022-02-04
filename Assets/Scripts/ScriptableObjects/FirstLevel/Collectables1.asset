@@ -19,5 +19,7 @@ MonoBehaviour:
   - {x: 0, y: 12, z: 3}
   - {x: 0, y: 12, z: 4}
   - {x: 0, y: 12, z: 5}
-  CollectableTypesCount: 1
+  - {x: 0, y: 0, z: 5}
+  - {x: 0, y: 0, z: 6}
+  - {x: 0, y: 0, z: 7}
   CollectableObjectsCapacity: 20

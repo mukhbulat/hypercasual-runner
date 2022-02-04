@@ -15,7 +15,8 @@ public class UIHandler : MonoBehaviour
         
     // Score
     [SerializeField] private List<Color> scoreColors;
-    [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI coinsText;
     private void Awake()
     {
         // Health
@@ -23,6 +24,8 @@ public class UIHandler : MonoBehaviour
         // Score
         playerStats.ScoreChange += OnScoreChange;
         playerStats.MultiplierChange += OnMultiplierChange;
+        // Coins
+        playerStats.CoinsChange += OnCoinsChange;
     }
 
     private void OnHealthChange(int newHealth)
@@ -46,12 +49,16 @@ public class UIHandler : MonoBehaviour
 
     private void OnScoreChange(int score)
     {
-        Debug.Log($"New score is {score}");
         scoreText.text = Convert.ToString(score);
     }
 
     private void DieUI()
     {
-            
+        
+    }
+
+    private void OnCoinsChange(int coins)
+    {
+        coinsText.text = Convert.ToString(coins);
     }
 }

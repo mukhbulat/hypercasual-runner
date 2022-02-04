@@ -7,21 +7,21 @@ namespace Pool.Collectables
     {
         
         [SerializeField] private List<GameObject> childPrefabs;
-        private Inventory _inventory;
+        private PlayerStats _playerStats;
 
-        private bool _isDoubleCoins = false;
+        private bool _isDoubleCoins;
         
         #region Interfaces
         
-        public void Obtain()
+        private void Obtain()
         {
             if (_isDoubleCoins)
             {
-                _inventory.Coins += 2;
+                _playerStats.Coins += 2;
             }
             else
             {
-                _inventory.Coins += 1;
+                _playerStats.Coins += 1;
             }
             transform.position = Vector3.zero;
         }
@@ -62,16 +62,20 @@ namespace Pool.Collectables
 
         private void Awake()
         {
-            // Because I need reference of inventory in this script anyway, I think, it's better to use event.
-            _inventory = GameObject.FindWithTag("Player").GetComponent<Inventory>();
-            _inventory.DoubleCoins += OnDoubleCoins;
+            _playerStats = GameObject.FindWithTag("Player").GetComponent<PlayerStats>();
+            Debug.Log(_playerStats == null ? "_playerStats == null" : "_playerStats are ok");
+            _playerStats.DoubleCoins += OnDoubleCoins;
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.GetComponent<Inventory>() != null)
+            if (other.GetComponent<PlayerStats>() != null)
             {
                 Obtain();
+            }
+            else
+            {
+                Debug.Log("wtf");
             }
         }
     }

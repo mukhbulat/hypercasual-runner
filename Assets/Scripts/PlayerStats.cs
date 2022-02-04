@@ -33,7 +33,6 @@ public class PlayerStats : MonoBehaviour
             }
 
             _health = value;
-            Debug.Log($"Health is {_health}");
             if (_health <= 0)
             {
                 Die();
@@ -50,11 +49,14 @@ public class PlayerStats : MonoBehaviour
     private int _scoreMultiplier;
     private int _score;
 
+    private int[] _floorHeights = new[] {6, 12};
+
     private int ScoreMultiplier
     {
         get => _scoreMultiplier;
         set
         {
+            if (_scoreMultiplier == value) return;
             MultiplierChange?.Invoke(value);
             _scoreMultiplier = value;
         }
@@ -70,13 +72,28 @@ public class PlayerStats : MonoBehaviour
         }
     }
     
+    // Coins
+
+    private int _coins;
+    public event Action<int> CoinsChange;
+    public event Action<bool> DoubleCoins;
+    public int Coins
+    {
+        get => _coins;
+        set
+        {
+            _coins = value;
+            CoinsChange?.Invoke(value);
+        }
+    }
+
     #endregion
 
     private void Awake()
     {
         _health = maxHealth;
         Score = 0;
-        _oldPlayerYPosition = (int) PlayerPosition.y;
+        _oldPlayerYPosition = (int) PlayerPosition.z;
     }
 
     private void Update()
@@ -84,6 +101,8 @@ public class PlayerStats : MonoBehaviour
         ScoreHandler();
     }
 
+    #region Health
+    
     private void Die()
     {
         Debug.Log("Dead!");
@@ -107,13 +126,17 @@ public class PlayerStats : MonoBehaviour
         _isInvulnerable = false;
     }
 
+    #endregion
+
+    #region Score
+
     private void ScoreHandler()
     {
-        if (PlayerPosition.y < 20)
+        if (PlayerPosition.y < _floorHeights[0])
         {
             ScoreMultiplier = 1;
         }
-        else if (PlayerPosition.y < 40)
+        else if (PlayerPosition.y < _floorHeights[1])
         {
             ScoreMultiplier = 2;
         }
@@ -122,10 +145,23 @@ public class PlayerStats : MonoBehaviour
             ScoreMultiplier = 3;
         }
 
-        if (PlayerPosition.y > _oldPlayerYPosition)
+        if (PlayerPosition.z > _oldPlayerYPosition)
         {
             _oldPlayerYPosition += 1;
             Score += ScoreMultiplier;
         }
     }
+    
+    #endregion
+
+    #region Coins
+    
+    private void OnX2Get()
+    {
+        DoubleCoins?.Invoke(true);
+    }
+
+    #endregion
+    
+    
 }
