@@ -1,50 +1,57 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DefaultNamespace
+public class UIHandler : MonoBehaviour
 {
-    public class UIHandler : MonoBehaviour
+    // General
+    [SerializeField] private PlayerStats playerStats;
+        
+    // Health
+    [SerializeField] private List<Sprite> heartSprites;
+    [SerializeField] private Image healthUI;
+        
+    // Score
+    [SerializeField] private List<Color> scoreColors;
+    [SerializeField] private TMP_Text scoreText;
+    private void Awake()
     {
-        // General
-        [SerializeField] private PlayerStats playerStats;
-        
         // Health
-        [SerializeField] private List<Sprite> heartSprites;
-        [SerializeField] private Image healthUI;
-        
+        playerStats.HealthChange += OnHealthChange;
         // Score
-        [SerializeField] private List<Color> scoreColors;
-        private int ScoreMultiplier => playerStats.ScoreMultiplier;
-        private int Score => playerStats.Score;
-        private void Awake()
-        {
-            playerStats.HealthChange += OnHealthChange;
-        }
+        playerStats.ScoreChange += OnScoreChange;
+        playerStats.MultiplierChange += OnMultiplierChange;
+    }
 
-        private void OnHealthChange(int newHealth)
+    private void OnHealthChange(int newHealth)
+    {
+        // TODO: UI things.
+        if (newHealth <= 0)
         {
-            // TODO: UI things.
-            if (newHealth <= 0)
-            {
-                DieUI();
-            }
-            else
-            {
-                healthUI.sprite = heartSprites[newHealth - 1];
-            }
-            
+            DieUI();
         }
+        else
+        {
+            healthUI.sprite = heartSprites[newHealth - 1];
+        }
+            
+    }
 
-        private void ScoreView()
-        {
-            
-        }
+    private void OnMultiplierChange(int multiplier)
+    {
+        scoreText.color = scoreColors[multiplier - 1];
+    }
 
-        private void DieUI()
-        {
+    private void OnScoreChange(int score)
+    {
+        Debug.Log($"New score is {score}");
+        scoreText.text = Convert.ToString(score);
+    }
+
+    private void DieUI()
+    {
             
-        }
     }
 }

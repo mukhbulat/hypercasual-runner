@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class PlayerStats : MonoBehaviour
 {
+    #region FieldsAndProperties
+
     // Health
     [SerializeField] private float regenerationTime = 5.0f;
     [SerializeField] private int maxHealth = 3;
@@ -41,18 +43,45 @@ public class PlayerStats : MonoBehaviour
 
     // Score
     public Vector3 PlayerPosition => transform.position;
-
-    private int _scoreMultiplier = 1;
-    private int _score = 0;
-
+    public event Action<int> MultiplierChange;
+    public event Action<int> ScoreChange;
     
-    public int ScoreMultiplier => -_scoreMultiplier;
-    public int Score => _score;
+    private int _oldPlayerYPosition;
+    private int _scoreMultiplier;
+    private int _score;
+
+    private int ScoreMultiplier
+    {
+        get => _scoreMultiplier;
+        set
+        {
+            MultiplierChange?.Invoke(value);
+            _scoreMultiplier = value;
+        }
+    }
+
+    private int Score
+    {
+        get => _score;
+        set
+        {
+            ScoreChange?.Invoke(value);
+            _score = value;
+        }
+    }
     
+    #endregion
+
     private void Awake()
     {
         _health = maxHealth;
-        _score = 0;
+        Score = 0;
+        _oldPlayerYPosition = (int) PlayerPosition.y;
+    }
+
+    private void Update()
+    {
+        ScoreHandler();
     }
 
     private void Die()
@@ -62,11 +91,12 @@ public class PlayerStats : MonoBehaviour
 
     private IEnumerator HealthRegeneration()
     {
+        yield return new WaitForSeconds(regenerationTime);
         while ( Health < 3)
         {
-            yield return new WaitForSeconds(regenerationTime);
-
             Health += 1;
+            
+            yield return new WaitForSeconds(regenerationTime);
         }
     }
 
@@ -81,19 +111,21 @@ public class PlayerStats : MonoBehaviour
     {
         if (PlayerPosition.y < 20)
         {
-            _scoreMultiplier = 1;
+            ScoreMultiplier = 1;
         }
         else if (PlayerPosition.y < 40)
         {
-            _scoreMultiplier = 2;
+            ScoreMultiplier = 2;
         }
         else
         {
-            _scoreMultiplier = 3;
+            ScoreMultiplier = 3;
         }
 
-        _score = (int) PlayerPosition.y * _scoreMultiplier;
-        
-        
+        if (PlayerPosition.y > _oldPlayerYPosition)
+        {
+            _oldPlayerYPosition += 1;
+            Score += ScoreMultiplier;
+        }
     }
 }
