@@ -2,7 +2,7 @@ namespace Game.States
 {
     public class PlayState : GameState
     {
-        public PlayState(GameProcessing gameProcessing, GameStateMachine stateMachine) : base(gameProcessing, stateMachine)
+        public PlayState(UIProcessing uiProcessing, GameStateMachine stateMachine) : base(uiProcessing, stateMachine)
         {
         }
         
@@ -10,6 +10,7 @@ namespace Game.States
         {
             base.Enter();
             Process.EnableCertainCanvas(0);
+            Process.GamePause(false);
         }
 
         public override void LogicUpdate()

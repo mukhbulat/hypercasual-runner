@@ -2,13 +2,14 @@ namespace Game.States
 {
     public class MenuState : GameState
     {
-        public MenuState(GameProcessing gameProcessing, GameStateMachine stateMachine) : base(gameProcessing, stateMachine)
+        public MenuState(UIProcessing uiProcessing, GameStateMachine stateMachine) : base(uiProcessing, stateMachine)
         {
         }
         
         public override void Enter()
         {
             base.Enter();
+            Process.GamePause(true);
         }
 
         public override void LogicUpdate()

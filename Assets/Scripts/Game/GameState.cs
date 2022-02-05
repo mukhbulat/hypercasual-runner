@@ -2,12 +2,12 @@ namespace Game
 {
     public abstract class GameState
     {
-        protected GameProcessing Process;
+        protected UIProcessing Process;
         protected GameStateMachine StateMachine;
 
-        protected GameState(GameProcessing gameProcessing, GameStateMachine stateMachine)
+        protected GameState(UIProcessing uiProcessing, GameStateMachine stateMachine)
         {
-            Process = gameProcessing;
+            Process = uiProcessing;
             StateMachine = stateMachine;
         }
         
