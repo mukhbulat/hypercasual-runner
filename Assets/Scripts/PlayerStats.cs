@@ -33,10 +33,6 @@ public class PlayerStats : MonoBehaviour
             }
 
             _health = value;
-            if (_health <= 0)
-            {
-                Die();
-            }
         }
     }
 
@@ -103,11 +99,6 @@ public class PlayerStats : MonoBehaviour
 
     #region Health
     
-    private void Die()
-    {
-        Debug.Log("Dead!");
-    }
-
     private IEnumerator HealthRegeneration()
     {
         yield return new WaitForSeconds(regenerationTime);

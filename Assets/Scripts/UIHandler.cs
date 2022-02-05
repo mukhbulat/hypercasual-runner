@@ -33,7 +33,7 @@ public class UIHandler : MonoBehaviour
         // TODO: UI things.
         if (newHealth <= 0)
         {
-            DieUI();
+            LoseUI();
         }
         else
         {
@@ -52,7 +52,7 @@ public class UIHandler : MonoBehaviour
         scoreText.text = Convert.ToString(score);
     }
 
-    private void DieUI()
+    private void LoseUI()
     {
         
     }
