@@ -9,6 +9,7 @@ namespace Game.States
         public override void Enter()
         {
             base.Enter();
+            Process.EnableCertainCanvas(2);
         }
 
         public override void LogicUpdate()

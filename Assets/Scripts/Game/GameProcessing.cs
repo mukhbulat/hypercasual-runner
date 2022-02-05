@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Game.States;
 using UnityEngine;
 
@@ -16,6 +17,9 @@ namespace Game
         private PlayState _playState;
         
 
+        
+        [SerializeField] private List<Canvas> listOfCanvases; 
+        
         #endregion
 
         #region Unity Functions
@@ -32,12 +36,35 @@ namespace Game
             _stateMachine.Initialize(_playState);
         }
 
+        private void Update()
+        {
+            _stateMachine.CurrentGameState.LogicUpdate();
+        }
+
         #endregion
         public void DisableAllCanvases()
         {
-            
+            foreach (var canvas in listOfCanvases)
+            {
+                canvas.enabled = false;
+            }
         }
-        
-        
+
+        public void EnableCertainCanvas(int index)
+        {
+            listOfCanvases[index].enabled = true;
+        }
+
+        public void GamePause(bool isPaused)
+        {
+            if (isPaused)
+            {
+                Time.timeScale = 0;
+            }
+            else
+            {
+                Time.timeScale = 1;
+            }
+        }
     }
 }
