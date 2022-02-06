@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Game;
 using UnityEngine;
 
-public class PlayerStats : MonoBehaviour
+public class PlayerStats : MonoBehaviour, IRestartable
 {
     #region FieldsAndProperties
 
@@ -153,6 +154,11 @@ public class PlayerStats : MonoBehaviour
     }
 
     #endregion
-    
-    
+
+
+    public void Restart()
+    {
+        Health = 3;
+        StopAllCoroutines();
+    }
 }

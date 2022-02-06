@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
+using Game;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour, IRestartable
 {
     [SerializeField] private CharacterController characterController;
     [SerializeField] private Animator animator;
@@ -25,10 +26,11 @@ public class PlayerMovement : MonoBehaviour
     
     private float _yVelocity;
     private bool _isGrounded;
+    // Data for restart.
+    private Vector3 _startingPosition;
+    
 
     // Obstacles bypassing
-    // Local origin of ray. 1.8 is the height of a character. 0.5 - radius of a character, so it's slightly larger.
-
     private readonly float _playerHeight = 1.8f;
     private Vector3 _rayOffset;
 
@@ -126,7 +128,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void Awake()
     {
-        _rayOffset = new Vector3(0, _playerHeight, 0.6f);
+        // For restarting purposes
+        _startingPosition = transform.position;
+        // 0.5 is radius of collider, 0.52 - just slightly larger.
+        _rayOffset = new Vector3(0, _playerHeight, 0.52f);
         
         _acceleration = speedIncrease.Evaluate(0);
         
@@ -160,5 +165,25 @@ public class PlayerMovement : MonoBehaviour
 
             yield return null;
         }
+    }
+
+    public void Restart()
+    {
+        transform.position = _startingPosition;
+        _acceleration = speedIncrease.Evaluate(0);
+        
+        StopAllCoroutines();
+        StartCoroutine(AcceleratingToMaxSpeed());
+    }
+
+    private void OnEnable()
+    {
+        animator.SetBool("InGame", true);
+    }
+
+    private void OnDisable()
+    {
+        
+        animator.SetBool("InGame", false);
     }
 }

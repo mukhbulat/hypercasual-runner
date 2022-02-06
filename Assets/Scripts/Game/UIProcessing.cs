@@ -14,7 +14,11 @@ namespace Game
 
         // General
         [SerializeField] private PlayerStats playerStats;
-        [SerializeField] private List<Canvas> listOfCanvases; 
+        [SerializeField] private List<Canvas> listOfCanvases;
+        [SerializeField] private List<MonoBehaviour> listOfRestartableScripts;
+        [SerializeField] private PlayerMovement playerMovement;
+
+        private List<IRestartable> _listOfIRestartables;
 
         // Health
         [SerializeField] private List<Sprite> heartSprites;
@@ -39,7 +43,7 @@ namespace Game
         private PlayState _playState;
         
         #endregion
-        
+
         private void Awake()
         {
             // Health
@@ -49,7 +53,7 @@ namespace Game
             playerStats.MultiplierChange += OnMultiplierChange;
             // Coins
             playerStats.CoinsChange += OnCoinsChange;
-        
+
             // State Machine
             _stateMachine = new GameStateMachine();
 
@@ -57,8 +61,18 @@ namespace Game
             _menuState = new MenuState(this, _stateMachine);
             _pauseState = new PauseState(this, _stateMachine);
             _playState = new PlayState(this, _stateMachine);
-            
+
             _stateMachine.Initialize(_playState);
+
+            // Checking restartable scripts.
+            _listOfIRestartables = new List<IRestartable>(listOfRestartableScripts.Count);
+            foreach (var script in listOfRestartableScripts)
+            {
+                if (script is IRestartable restartable)
+                {
+                    _listOfIRestartables.Add(restartable);
+                }
+            }
         }
 
 
@@ -113,9 +127,17 @@ namespace Game
             coinsText.text = Convert.ToString(coins);
         }
 
-        private void Restart()
+        public void Restart()
         {
-            
+            foreach (var restartable in _listOfIRestartables)
+            {
+                restartable.Restart();
+            }
+        }
+
+        public void EnableMovement(bool isEnabled)
+        {
+            playerMovement.enabled = isEnabled;
         }
 
         #region Buttons
@@ -153,8 +175,9 @@ namespace Game
                 _soundEnabled = true;
                 soundButtonImage.sprite = soundButtonSprites[1];
             }
-            // TODO SoundManager.
+            // TODO Sound Manager.
         }
         #endregion
+        
     }
 }

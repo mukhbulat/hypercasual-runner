@@ -9,7 +9,10 @@ namespace Game.States
         public override void Enter()
         {
             base.Enter();
-            Process.GamePause(true);
+            Process.EnableCertainCanvas(3);
+            Process.GamePause(false);
+            Process.Restart();
+            Process.EnableMovement(false);
         }
 
         public override void LogicUpdate()
@@ -20,6 +23,7 @@ namespace Game.States
         public override void Exit()
         {
             base.Exit();
+            Process.EnableMovement(true);
         }
     }
 }
