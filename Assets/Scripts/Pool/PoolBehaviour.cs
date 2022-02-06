@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Game;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Pool
 {
-    public class PoolBehaviour : MonoBehaviour
+    public class PoolBehaviour : MonoBehaviour, IRestartable
     {
         #region FieldsAndProperties
 
@@ -73,24 +74,19 @@ namespace Pool
             int platformTypesCount = levelSegments[0].Platforms.GetTypesCount;
             InitializeQueue(_platformsQueue, platformTypesCount,
                 platformsCapacity, platformBehaviourPrefab);
-            QueueMixing(_platformsQueue, i, 0, firstSegment.Platforms);
-            QueueMixing(_platformsQueue, j, 1, secondSegment.Platforms);
             
             // Collectables
             int collectableTypesCount = levelSegments[0].Collectables.GetTypesCount;
             InitializeQueue(_collectablesQueue, collectableTypesCount,
                 collectablesCapacity, collectableBehaviourPrefab);
-            QueueMixing(_collectablesQueue, i, 0, firstSegment.Collectables);
-            QueueMixing(_collectablesQueue, j, 1, secondSegment.Collectables);
             
             // Environment
             int environmentTypesCount = levelSegments[0].Environments.GetTypesCount;
             InitializeQueue(_environmentsQueue, environmentTypesCount,
                 environmentsCapacity, environmentBehaviourPrefab);
-            QueueMixing(_environmentsQueue, i, 0, firstSegment.Environments);
-            QueueMixing(_environmentsQueue, j, 1, secondSegment.Environments);
             
-            StartCoroutine(MoveObjectsLoop());
+            StartCoroutine(RestartingPool(i, j, firstSegment, secondSegment));
+            
         }
 
 
@@ -187,6 +183,45 @@ namespace Pool
         }
 
         #endregion
+
+        
+        
+        public void Restart()
+        // Copy paste of awake without queue initialization.
+        // Could make another method with all of this, and call it in awake or here.
+        {
+            StopAllCoroutines();
+            
+            // Getting two random segments to make first two segments.
+            int i = Random.Range(0, LevelSegmentsCount);
+            var firstSegment = levelSegments[i];
+            int j = Random.Range(0, LevelSegmentsCount);
+            var secondSegment = levelSegments[j];
+            
+            StartCoroutine(RestartingPool(i, j, firstSegment, secondSegment));
+        }
+
+        private IEnumerator RestartingPool(int i, int j, LevelSegment firstSegment, LevelSegment secondSegment)
+        {
+            
+            yield return null;
+            // Initializing queues ana making first two segments to appear.
+            _currentSegment = firstSegment;
+            _nextSegment = secondSegment;
+            
+            QueueMixing(_platformsQueue, i, 0, firstSegment.Platforms);
+            QueueMixing(_platformsQueue, j, 1, secondSegment.Platforms);
+            yield return null;
+            
+            QueueMixing(_collectablesQueue, i, 0, firstSegment.Collectables);
+            QueueMixing(_collectablesQueue, j, 1, secondSegment.Collectables);
+            yield return null;
+            
+            QueueMixing(_environmentsQueue, i, 0, firstSegment.Environments);
+            QueueMixing(_environmentsQueue, j, 1, secondSegment.Environments);
+            yield return null;
+            
+            StartCoroutine(MoveObjectsLoop());
+        }
     }
-    
 }

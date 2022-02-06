@@ -23,16 +23,21 @@ namespace Game
         [SerializeField] private List<Sprite> heartSprites;
         [SerializeField] private Image healthUI;
         
-        // Score
+        // Score and coins
         [SerializeField] private List<Color> scoreColors;
         [SerializeField] private TextMeshProUGUI scoreText;
         [SerializeField] private TextMeshProUGUI coinsText;
-
+        [SerializeField] private TextMeshProUGUI loseScoreText;
+        [SerializeField] private TextMeshProUGUI loseCoinsText;
+        
         private int _scoreMultiplier = 1;
+        private int _travelDistance = 0;
+        private int _score = 0;
     
         // Buttons
         [SerializeField] private List<Sprite> soundButtonSprites;
         [SerializeField] private Image soundButtonImage;
+        
         private bool _soundEnabled = true;
         
         // State Machine
@@ -57,7 +62,7 @@ namespace Game
             // Health
             playerStats.HealthChange += OnHealthChange;
             // Score
-            playerStats.ScoreChange += OnDistanceChange;
+            playerStats.DistanceChange += OnDistanceChange;
             playerStats.MultiplierChange += OnMultiplierChange;
             // Coins
             playerStats.CoinsChange += OnCoinsChange;
@@ -87,6 +92,22 @@ namespace Game
                 canvas.enabled = false;
             }
         }
+        
+        public void Restart()
+        {
+            _scoreMultiplier = 1;
+            _travelDistance = 0;
+            _score = 0;
+            foreach (var script in _listOfIRestartables)
+            {
+                script.Restart();
+            }
+        }
+
+        public void EnableMovement(bool isEnabled)
+        {
+            playerMovement.IsEnabled = isEnabled;
+        }
 
         public void EnableCertainCanvas(int index)
         {
@@ -96,6 +117,12 @@ namespace Game
         public void GamePause(bool isPaused)
         {
             Time.timeScale = isPaused ? 0 : 1;
+        }
+
+        public void OnLose()
+        {
+            loseCoinsText.text = $"Coins: {playerStats.Coins}";
+            loseScoreText.text = $"Score: {_score}";
         }
 
         #region State Independent Event Listeners
@@ -120,7 +147,12 @@ namespace Game
 
         private void OnDistanceChange(int distance)
         {
-            scoreText.text = Convert.ToString(distance * _scoreMultiplier);
+            // Bad code. idk, how to make it better.
+            // Parenthesized expression always 1. so technically, I don't need distance here. 
+            _score += (distance - _travelDistance) * _scoreMultiplier;
+            _travelDistance = distance;
+            
+            scoreText.text = Convert.ToString(_score);
         }
 
         private void OnCoinsChange(int coins)
@@ -130,19 +162,6 @@ namespace Game
 
         #endregion
         
-        public void Restart()
-        {
-            foreach (var script in _listOfIRestartables)
-            {
-                script.Restart();
-            }
-        }
-
-        public void EnableMovement(bool isEnabled)
-        {
-            playerMovement.IsEnabled = isEnabled;
-        }
-
         #region Buttons
         
         public void OnHomeButtonClick()

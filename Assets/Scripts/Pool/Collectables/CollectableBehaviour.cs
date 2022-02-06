@@ -62,7 +62,7 @@ namespace Pool.Collectables
 
         private void Awake()
         {
-            _playerStats = GameObject.FindWithTag("Player").GetComponent<PlayerStats>();
+            _playerStats = GameObject.Find("PlayerStats").GetComponent<PlayerStats>();
             _playerStats.DoubleCoins += OnDoubleCoins;
         }
 

@@ -41,7 +41,7 @@ public class PlayerStats : MonoBehaviour, IRestartable
     [SerializeField] private Transform player;
     public Vector3 PlayerPosition => player.position;
     public event Action<int> MultiplierChange;
-    public event Action<int> ScoreChange;
+    public event Action<int> DistanceChange;
     
     private int _oldPlayerYPosition;
     private int _scoreMultiplier;
@@ -65,7 +65,7 @@ public class PlayerStats : MonoBehaviour, IRestartable
         get => _travelDistance;
         set
         {
-            ScoreChange?.Invoke(value);
+            DistanceChange?.Invoke(value);
             _travelDistance = value;
         }
     }
