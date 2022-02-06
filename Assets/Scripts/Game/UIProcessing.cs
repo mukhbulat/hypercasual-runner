@@ -19,7 +19,6 @@ namespace Game
         [SerializeField] private PlayerMovement playerMovement;
 
         private List<IRestartable> _listOfIRestartables;
-
         // Health
         [SerializeField] private List<Sprite> heartSprites;
         [SerializeField] private Image healthUI;
@@ -48,6 +47,13 @@ namespace Game
 
         private void Awake()
         {
+            // Checking restartable scripts.
+            _listOfIRestartables = new List<IRestartable>(listOfRestartableScripts.Count);
+            foreach (var restartableScript in listOfRestartableScripts)
+            {
+                IRestartable temporary = restartableScript as IRestartable;
+                _listOfIRestartables.Add(temporary);
+            }
             // Health
             playerStats.HealthChange += OnHealthChange;
             // Score
@@ -65,20 +71,6 @@ namespace Game
             _playState = new PlayState(this, _stateMachine);
 
             _stateMachine.Initialize(_menuState);
-
-            // Checking restartable scripts.
-            _listOfIRestartables = new List<IRestartable>(listOfRestartableScripts.Count);
-            foreach (var script in listOfRestartableScripts)
-            {
-                if (script is IRestartable restartable)
-                {
-                    _listOfIRestartables.Add(restartable);
-                }
-                else
-                {
-                    Debug.Log("Fuck");
-                }
-            }
         }
 
 
@@ -140,9 +132,9 @@ namespace Game
         
         public void Restart()
         {
-            foreach (var restartable in _listOfIRestartables)
+            foreach (var script in _listOfIRestartables)
             {
-                restartable.Restart();
+                script.Restart();
             }
         }
 

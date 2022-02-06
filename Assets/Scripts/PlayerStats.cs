@@ -155,8 +155,7 @@ public class PlayerStats : MonoBehaviour, IRestartable
     }
 
     #endregion
-
-
+    
     public void Restart()
     {
         Health = 3;

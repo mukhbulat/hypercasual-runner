@@ -4,7 +4,7 @@ using Game;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public abstract class PlayerMovement : MonoBehaviour, IRestartable
+public class PlayerMovement : MonoBehaviour, IRestartable
 {
     // Components
     [SerializeField] private CharacterController characterController;
@@ -58,6 +58,7 @@ public abstract class PlayerMovement : MonoBehaviour, IRestartable
         }
     }
 
+        
     private void Movement()
     {
         _isGrounded = characterController.isGrounded;
