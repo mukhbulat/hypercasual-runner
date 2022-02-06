@@ -4,20 +4,33 @@ using Game;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class PlayerMovement : MonoBehaviour, IRestartable
+public abstract class PlayerMovement : MonoBehaviour, IRestartable
 {
+    // Components
     [SerializeField] private CharacterController characterController;
     [SerializeField] private Animator animator;
     [SerializeField] private PlayerStats playerStats;
-    
+    // Values to tweak
     [SerializeField] private float jumpHeight = 6f;
     [SerializeField] private AnimationCurve speedIncrease;
     [SerializeField] private AnimationCurve speedAtMaxSpeed;
     [SerializeField] private float timeToGetFullSpeed = 60f;
     [SerializeField] private float timeOfMaxSpeedLoop = 10f;
-    //
+    // Animator Parameters
     private static readonly int VerticalVelocity = Animator.StringToHash("VerticalVelocity");
     private static readonly int StumbleTrigger = Animator.StringToHash("StumbleTrigger");
+    private static readonly int InGame = Animator.StringToHash("InGame");
+    // Enable/Disable movement.
+    private bool _isEnabled;
+    public bool IsEnabled
+    {
+        get => _isEnabled;
+        set
+        {
+            _isEnabled = value;
+            animator.SetBool(InGame, value);
+        }
+    }
     //
     private readonly float _speed = 15f;
     private float _acceleration;
@@ -38,6 +51,14 @@ public class PlayerMovement : MonoBehaviour, IRestartable
     private float _stumbleDistanceToVelocity = 1f;
 
     private void Update()
+    {
+        if (IsEnabled)
+        {
+            Movement();
+        }
+    }
+
+    private void Movement()
     {
         _isGrounded = characterController.isGrounded;
         
@@ -174,16 +195,5 @@ public class PlayerMovement : MonoBehaviour, IRestartable
         
         StopAllCoroutines();
         StartCoroutine(AcceleratingToMaxSpeed());
-    }
-
-    private void OnEnable()
-    {
-        animator.SetBool("InGame", true);
-    }
-
-    private void OnDisable()
-    {
-        
-        animator.SetBool("InGame", false);
     }
 }

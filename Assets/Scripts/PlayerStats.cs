@@ -38,13 +38,14 @@ public class PlayerStats : MonoBehaviour, IRestartable
     }
 
     // Score
-    public Vector3 PlayerPosition => transform.position;
+    [SerializeField] private Transform player;
+    public Vector3 PlayerPosition => player.position;
     public event Action<int> MultiplierChange;
     public event Action<int> ScoreChange;
     
     private int _oldPlayerYPosition;
     private int _scoreMultiplier;
-    private int _score;
+    private int _travelDistance;
 
     private int[] _floorHeights = new[] {6, 12};
 
@@ -59,13 +60,13 @@ public class PlayerStats : MonoBehaviour, IRestartable
         }
     }
 
-    private int Score
+    private int TravelDistance
     {
-        get => _score;
+        get => _travelDistance;
         set
         {
             ScoreChange?.Invoke(value);
-            _score = value;
+            _travelDistance = value;
         }
     }
     
@@ -89,7 +90,7 @@ public class PlayerStats : MonoBehaviour, IRestartable
     private void Awake()
     {
         _health = maxHealth;
-        Score = 0;
+        TravelDistance = 0;
         _oldPlayerYPosition = (int) PlayerPosition.z;
     }
 
@@ -140,7 +141,7 @@ public class PlayerStats : MonoBehaviour, IRestartable
         if (PlayerPosition.z > _oldPlayerYPosition)
         {
             _oldPlayerYPosition += 1;
-            Score += ScoreMultiplier;
+            TravelDistance += 1;
         }
     }
     
@@ -159,6 +160,8 @@ public class PlayerStats : MonoBehaviour, IRestartable
     public void Restart()
     {
         Health = 3;
+        Coins = 0;
+        TravelDistance = 0;
         StopAllCoroutines();
     }
 }

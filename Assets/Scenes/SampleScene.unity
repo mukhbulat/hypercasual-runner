@@ -462,7 +462,6 @@ GameObject:
   - component: {fileID: 154500853}
   - component: {fileID: 154500854}
   - component: {fileID: 154500855}
-  - component: {fileID: 154500857}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -518,7 +517,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterController: {fileID: 154500854}
   animator: {fileID: 178400526}
-  playerStats: {fileID: 154500857}
+  playerStats: {fileID: 188239592}
   jumpHeight: 6
   speedIncrease:
     serializedVersion: 2
@@ -633,21 +632,6 @@ MonoBehaviour:
     m_RotationOrder: 4
   timeToGetFullSpeed: 60
   timeOfMaxSpeedLoop: 10
---- !u!114 &154500857
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 154500852}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 063f276915584339b211862ff6a0efac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  regenerationTime: 5
-  maxHealth: 3
-  invulnerabilityTime: 0.3
 --- !u!1 &176844459
 GameObject:
   m_ObjectHideFlags: 0
@@ -869,6 +853,53 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &188239591
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 188239593}
+  - component: {fileID: 188239592}
+  m_Layer: 0
+  m_Name: PlayerStats
+  m_TagString: Player
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &188239592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 188239591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 063f276915584339b211862ff6a0efac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  regenerationTime: 5
+  maxHealth: 3
+  invulnerabilityTime: 0.3
+  player: {fileID: 154500853}
+--- !u!4 &188239593
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 188239591}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 239.26988, y: 243.37784, z: 5.4089966}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &225235590
 GameObject:
@@ -4378,13 +4409,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 949f0660b6ee4aba826efcd3fbfecaec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerStats: {fileID: 154500857}
+  playerStats: {fileID: 188239592}
   listOfCanvases:
   - {fileID: 594431762}
   - {fileID: 1070935025}
   - {fileID: 1364006453}
   - {fileID: 1672700449}
-  listOfRestartableScripts: []
+  listOfRestartableScripts:
+  - {fileID: 154500855}
+  - {fileID: 188239592}
+  playerMovement: {fileID: 154500855}
   heartSprites:
   - {fileID: 21300000, guid: b971fab8a5658340a8ac97dc01aaa7bc, type: 3}
   - {fileID: 21300000, guid: b2f6a9834e466defeaecafdfbe1dec3e, type: 3}

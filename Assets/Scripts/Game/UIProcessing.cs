@@ -28,6 +28,8 @@ namespace Game
         [SerializeField] private List<Color> scoreColors;
         [SerializeField] private TextMeshProUGUI scoreText;
         [SerializeField] private TextMeshProUGUI coinsText;
+
+        private int _scoreMultiplier = 1;
     
         // Buttons
         [SerializeField] private List<Sprite> soundButtonSprites;
@@ -49,7 +51,7 @@ namespace Game
             // Health
             playerStats.HealthChange += OnHealthChange;
             // Score
-            playerStats.ScoreChange += OnScoreChange;
+            playerStats.ScoreChange += OnDistanceChange;
             playerStats.MultiplierChange += OnMultiplierChange;
             // Coins
             playerStats.CoinsChange += OnCoinsChange;
@@ -62,7 +64,7 @@ namespace Game
             _pauseState = new PauseState(this, _stateMachine);
             _playState = new PlayState(this, _stateMachine);
 
-            _stateMachine.Initialize(_playState);
+            _stateMachine.Initialize(_menuState);
 
             // Checking restartable scripts.
             _listOfIRestartables = new List<IRestartable>(listOfRestartableScripts.Count);
@@ -71,6 +73,10 @@ namespace Game
                 if (script is IRestartable restartable)
                 {
                     _listOfIRestartables.Add(restartable);
+                }
+                else
+                {
+                    Debug.Log("Fuck");
                 }
             }
         }
@@ -99,7 +105,9 @@ namespace Game
         {
             Time.timeScale = isPaused ? 0 : 1;
         }
-    
+
+        #region State Independent Event Listeners
+
         private void OnHealthChange(int newHealth)
         {
             if (newHealth <= 0)
@@ -115,11 +123,12 @@ namespace Game
         private void OnMultiplierChange(int multiplier)
         {
             scoreText.color = scoreColors[multiplier - 1];
+            _scoreMultiplier = multiplier;
         }
 
-        private void OnScoreChange(int score)
+        private void OnDistanceChange(int distance)
         {
-            scoreText.text = Convert.ToString(score);
+            scoreText.text = Convert.ToString(distance * _scoreMultiplier);
         }
 
         private void OnCoinsChange(int coins)
@@ -127,6 +136,8 @@ namespace Game
             coinsText.text = Convert.ToString(coins);
         }
 
+        #endregion
+        
         public void Restart()
         {
             foreach (var restartable in _listOfIRestartables)
@@ -137,7 +148,7 @@ namespace Game
 
         public void EnableMovement(bool isEnabled)
         {
-            playerMovement.enabled = isEnabled;
+            playerMovement.IsEnabled = isEnabled;
         }
 
         #region Buttons

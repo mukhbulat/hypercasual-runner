@@ -68,13 +68,13 @@ namespace Pool.Collectables
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.GetComponent<PlayerStats>() != null)
+            if (other.GetComponent<PlayerMovement>() != null)
             {
                 Obtain();
             }
             else
             {
-                Debug.Log("wtf");
+                Debug.Log($"PlayerMovement is not found on this coin {this}");
             }
         }
     }
