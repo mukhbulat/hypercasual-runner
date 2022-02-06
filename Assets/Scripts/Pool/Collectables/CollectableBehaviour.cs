@@ -74,7 +74,7 @@ namespace Pool.Collectables
             }
             else
             {
-                Debug.Log($"PlayerMovement is not found on this coin {this}");
+                Debug.Log($"PlayerMovement is not found on this {other}");
             }
         }
     }

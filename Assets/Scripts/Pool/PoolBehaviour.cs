@@ -100,7 +100,7 @@ namespace Pool
                 float currentSegmentLength = _currentSegment.Length;
                 _currentSegmentNumber = (int) (PlayerZPosition / currentSegmentLength);
                 float modulo = PlayerZPosition % currentSegmentLength;
-                // If player passed 1/5 of current segment, dequeue previous segment and create new one in front.
+                // If player passed 1/20 of current segment, dequeue previous segment and create new one in front.
                 if (_currentSegmentNumber == _nextSegmentNumber && modulo > currentSegmentLength / 20)
                 {
                     int nextSegmentIndex = Random.Range(0, LevelSegmentsCount);
@@ -115,8 +115,7 @@ namespace Pool
                     yield return null;
                 }
 
-                // For this time changing objects won't be needed and not necessary anyway.
-                yield return new WaitForSeconds(0.05f);
+                yield return null;
             }
         }
         
@@ -205,7 +204,7 @@ namespace Pool
         {
             
             yield return null;
-            // Initializing queues ana making first two segments to appear.
+            // Initializing queues and making first two segments to appear.
             _currentSegment = firstSegment;
             _nextSegment = secondSegment;
             
@@ -220,6 +219,7 @@ namespace Pool
             QueueMixing(_environmentsQueue, i, 0, firstSegment.Environments);
             QueueMixing(_environmentsQueue, j, 1, secondSegment.Environments);
             yield return null;
+            
             
             StartCoroutine(MoveObjectsLoop());
         }
