@@ -43,7 +43,8 @@ public class PlayerStats : MonoBehaviour, IRestartable
     public event Action<int> MultiplierChange;
     public event Action<int> DistanceChange;
     
-    private int _oldPlayerYPosition;
+    private int _oldPlayerZPosition;
+    private int _playerStartingZPosition;
     private int _scoreMultiplier;
     private int _travelDistance;
 
@@ -91,7 +92,8 @@ public class PlayerStats : MonoBehaviour, IRestartable
     {
         _health = maxHealth;
         TravelDistance = 0;
-        _oldPlayerYPosition = (int) PlayerPosition.z;
+        _oldPlayerZPosition = (int) PlayerPosition.z;
+        _playerStartingZPosition = _oldPlayerZPosition;
     }
 
     private void Update()
@@ -138,9 +140,9 @@ public class PlayerStats : MonoBehaviour, IRestartable
             ScoreMultiplier = 3;
         }
 
-        if (PlayerPosition.z > _oldPlayerYPosition)
+        if (PlayerPosition.z > _oldPlayerZPosition)
         {
-            _oldPlayerYPosition += 1;
+            _oldPlayerZPosition += 1;
             TravelDistance += 1;
         }
     }
@@ -161,6 +163,7 @@ public class PlayerStats : MonoBehaviour, IRestartable
         Health = 3;
         Coins = 0;
         TravelDistance = 0;
+        _oldPlayerZPosition = _playerStartingZPosition;
         StopAllCoroutines();
     }
 }

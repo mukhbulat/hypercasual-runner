@@ -20,6 +20,8 @@ namespace Pool
 
         private LevelSegment _currentSegment;
         private LevelSegment _nextSegment;
+
+        private bool _inMovingObjectsLoop;
         
         //Player
         [SerializeField] private Transform player;
@@ -70,23 +72,21 @@ namespace Pool
             // Initializing queues ana making first two segments to appear.
             _currentSegment = firstSegment;
             _nextSegment = secondSegment;
-            // Platforms
+            
             int platformTypesCount = levelSegments[0].Platforms.GetTypesCount;
             InitializeQueue(_platformsQueue, platformTypesCount,
                 platformsCapacity, platformBehaviourPrefab);
             
-            // Collectables
             int collectableTypesCount = levelSegments[0].Collectables.GetTypesCount;
             InitializeQueue(_collectablesQueue, collectableTypesCount,
                 collectablesCapacity, collectableBehaviourPrefab);
             
-            // Environment
             int environmentTypesCount = levelSegments[0].Environments.GetTypesCount;
             InitializeQueue(_environmentsQueue, environmentTypesCount,
                 environmentsCapacity, environmentBehaviourPrefab);
             
-            StartCoroutine(RestartingPool(i, j, firstSegment, secondSegment));
             
+            StartCoroutine(RestartingPool(i, j, firstSegment, secondSegment));
         }
 
 
@@ -107,6 +107,8 @@ namespace Pool
                     _nextSegment = levelSegments[nextSegmentIndex];
                     _nextSegmentNumber += 1;
                     
+                    _inMovingObjectsLoop = true;
+                    
                     QueueMixing(_platformsQueue, nextSegmentIndex, _nextSegmentNumber, _nextSegment.Platforms);
                     yield return null;
                     QueueMixing(_collectablesQueue, nextSegmentIndex, _nextSegmentNumber, _nextSegment.Collectables);
@@ -115,6 +117,7 @@ namespace Pool
                     yield return null;
                 }
 
+                _inMovingObjectsLoop = false;
                 yield return null;
             }
         }
@@ -183,14 +186,19 @@ namespace Pool
 
         #endregion
 
-        
-        
-        public void Restart()
-        // Copy paste of awake without queue initialization.
-        // Could make another method with all of this, and call it in awake or here.
+        private IEnumerator WaitForLoopExitAndRestart()
+        {
+            while (_inMovingObjectsLoop)
+            {
+                yield return null;
+            }
+            ThirdPartOfRestart();
+        }
+
+        private void ThirdPartOfRestart()
         {
             StopAllCoroutines();
-            
+
             // Getting two random segments to make first two segments.
             int i = Random.Range(0, LevelSegmentsCount);
             var firstSegment = levelSegments[i];
@@ -200,6 +208,13 @@ namespace Pool
             StartCoroutine(RestartingPool(i, j, firstSegment, secondSegment));
         }
 
+        public void Restart()
+        // Restart here in three parts. First: this one, called by interface. Second - coroutine, which waits for all 
+        // queues (platforms, collectables, etc.) to be in one condition
+        {
+            StartCoroutine(WaitForLoopExitAndRestart());
+        }
+
         private IEnumerator RestartingPool(int i, int j, LevelSegment firstSegment, LevelSegment secondSegment)
         {
             
@@ -207,6 +222,9 @@ namespace Pool
             // Initializing queues and making first two segments to appear.
             _currentSegment = firstSegment;
             _nextSegment = secondSegment;
+
+            _currentSegmentNumber = 0;
+            _nextSegmentNumber = 1;
             
             QueueMixing(_platformsQueue, i, 0, firstSegment.Platforms);
             QueueMixing(_platformsQueue, j, 1, secondSegment.Platforms);
@@ -219,7 +237,6 @@ namespace Pool
             QueueMixing(_environmentsQueue, i, 0, firstSegment.Environments);
             QueueMixing(_environmentsQueue, j, 1, secondSegment.Environments);
             yield return null;
-            
             
             StartCoroutine(MoveObjectsLoop());
         }

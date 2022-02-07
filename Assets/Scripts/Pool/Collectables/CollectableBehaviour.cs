@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +10,10 @@ namespace Pool.Collectables
         [SerializeField] private List<GameObject> childPrefabs;
         private PlayerStats _playerStats;
 
+        [SerializeField] private float particleLifetime = 0.5f;
+        private ParticleSystem _particleSystem;
+        private MeshRenderer _childMeshRenderer;
+        
         private bool _isDoubleCoins;
         
         #region Interfaces
@@ -23,7 +28,7 @@ namespace Pool.Collectables
             {
                 _playerStats.Coins += 1;
             }
-            transform.position = Vector3.zero;
+            StartCoroutine(ParticleEffectAndMove());
         }
 
         public IPoolable Initialize(int index)
@@ -57,15 +62,26 @@ namespace Pool.Collectables
 
         private void SetChild(int index)
         {
-            Instantiate(childPrefabs[index], gameObject.transform);
+            _childMeshRenderer = Instantiate(childPrefabs[index], gameObject.transform).GetComponent<MeshRenderer>();
         }
 
         private void Awake()
         {
             _playerStats = GameObject.Find("PlayerStats").GetComponent<PlayerStats>();
             _playerStats.DoubleCoins += OnDoubleCoins;
+            _particleSystem = GetComponent<ParticleSystem>();
         }
 
+        private IEnumerator ParticleEffectAndMove()
+        {
+            _particleSystem.Play();
+            _childMeshRenderer.enabled = false;
+            yield return new WaitForSeconds(particleLifetime);
+            _particleSystem.Stop();
+            transform.position = Vector3.zero;
+            _childMeshRenderer.enabled = true;
+        }
+        
         private void OnTriggerEnter(Collider other)
         {
             if (other.GetComponent<PlayerMovement>() != null)
