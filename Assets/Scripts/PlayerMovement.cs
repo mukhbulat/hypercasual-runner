@@ -20,6 +20,8 @@ public class PlayerMovement : MonoBehaviour, IRestartable
     private static readonly int VerticalVelocity = Animator.StringToHash("VerticalVelocity");
     private static readonly int StumbleTrigger = Animator.StringToHash("StumbleTrigger");
     private static readonly int InGame = Animator.StringToHash("InGame");
+    private static readonly int ClimbTrigger = Animator.StringToHash("ClimbTrigger");
+    private static readonly int HitHeadTrigger = Animator.StringToHash("HitHeadTrigger");
     // Enable/Disable movement.
     private bool _isEnabled;
     public bool IsEnabled
@@ -44,17 +46,26 @@ public class PlayerMovement : MonoBehaviour, IRestartable
     
 
     // Obstacles bypassing
-    private readonly float _playerHeight = 1.8f;
+    private bool _isBypassing;
+    private float _playerHeight;
     private Vector3 _rayOffset;
 
+    private float _playerRadius;
+    // Just a little value for ray offset.
+    private float _delta = 0.05f;
+
     // Ratio on how strongly stumble will influence _yVelocity.
-    private float _stumbleDistanceToVelocity = 1f;
+    private float _bypassDistanceToVelocityRatio = 1f;
 
     private void Update()
     {
         if (IsEnabled)
         {
             Movement();
+            
+            HandleObstacleBypass();
+            
+            HandleAnimatorTree();
         }
     }
 
@@ -73,12 +84,9 @@ public class PlayerMovement : MonoBehaviour, IRestartable
         characterController.Move(Vector3.forward * _speed * _acceleration * Time.deltaTime);
         
         Jump();
-        
-        HandleObstacleBypass();
 
         VerticalMoving();
         
-        HandleAnimator();
     }
 
     private void Jump()
@@ -105,34 +113,36 @@ public class PlayerMovement : MonoBehaviour, IRestartable
             RaycastHit hit;
             Ray ray = new Ray(transform.position + _rayOffset, Vector3.down);
             
-            if (Physics.Raycast(ray, out hit, _playerHeight))
+            if (Physics.Raycast(ray, out hit, _playerHeight - _delta))
             {
-                float distance = hit.distance - _playerHeight / 2;
+                float distance = hit.distance - (_playerHeight - _delta * 2) / 2;
                 // Check the hit distance and respond accordingly
+                int animatorHash = distance < 0 ? HitHeadTrigger : ClimbTrigger;
+                
                 if (Mathf.Abs(distance) < 0.25f * _playerHeight)
                 {
-                    animator.SetTrigger(StumbleTrigger);
+                    animator.SetTrigger(animatorHash);
                     
                     playerStats.Health -= 2;
-                    _yVelocity += distance * _stumbleDistanceToVelocity;
+                    _yVelocity += distance * _bypassDistanceToVelocityRatio;
                 }
                 else if (Mathf.Abs(distance) < 0.35f * _playerHeight)
                 {
-                    animator.SetTrigger(StumbleTrigger);
-                    
+                    animator.SetTrigger(animatorHash);
+
                     playerStats.Health -= 1;
-                    _yVelocity += distance * _stumbleDistanceToVelocity;
+                    _yVelocity += distance * _bypassDistanceToVelocityRatio;
                 }
                 else
                 {
-                    _yVelocity += distance * _stumbleDistanceToVelocity;
+                    _yVelocity += distance * _bypassDistanceToVelocityRatio;
                 }
                 
             }
         }
     }
 
-    private void HandleAnimator()
+    private void HandleAnimatorTree()
     {
         if (_isGrounded)
         {
@@ -150,10 +160,14 @@ public class PlayerMovement : MonoBehaviour, IRestartable
 
     private void Awake()
     {
-        // For restarting purposes
+        // For restarting purposes.
         _startingPosition = transform.position;
-        // 0.5 is radius of collider, 0.52 - just slightly larger.
-        _rayOffset = new Vector3(0, _playerHeight, 0.52f);
+
+        // For obstacle bypassing.
+        _playerHeight = characterController.height;
+        _playerRadius = characterController.radius;
+        _rayOffset = new Vector3(0, _playerHeight - _delta, _playerRadius + _delta);
+        
         
         _acceleration = speedIncrease.Evaluate(0);
         

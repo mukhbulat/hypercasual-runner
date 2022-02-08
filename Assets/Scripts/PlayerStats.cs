@@ -48,7 +48,7 @@ public class PlayerStats : MonoBehaviour, IRestartable
     private int _scoreMultiplier;
     private int _travelDistance;
 
-    private int[] _floorHeights = new[] {6, 12};
+    private readonly int[] _floorHeights = {6, 12};
 
     private int ScoreMultiplier
     {
@@ -149,8 +149,8 @@ public class PlayerStats : MonoBehaviour, IRestartable
     
     #endregion
 
-    #region Coins
-    
+    #region Collectables
+
     private void OnX2Get()
     {
         DoubleCoins?.Invoke(true);
