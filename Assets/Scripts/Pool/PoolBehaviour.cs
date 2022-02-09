@@ -57,6 +57,14 @@ namespace Pool
         [SerializeField] private int environmentsCapacity = 8;
 
         private Queue<List<List<IPoolable>>> _environmentsQueue = new Queue<List<List<IPoolable>>>(3);
+        
+        // Barriers
+        [SerializeField] private GameObject barrierBehaviourPrefab;
+        // This should be more than max in EnvironmentSegments.
+        [SerializeField] private int barriersCapacity = 8;
+
+        private Queue<List<List<IPoolable>>> _barriersQueue = new Queue<List<List<IPoolable>>>(3);
+
 
         #endregion
         #region UnityFuncs
@@ -84,7 +92,10 @@ namespace Pool
             int environmentTypesCount = levelSegments[0].Environments.GetTypesCount;
             InitializeQueue(_environmentsQueue, environmentTypesCount,
                 environmentsCapacity, environmentBehaviourPrefab);
-            
+
+            int barriersTypesCount = levelSegments[0].Barriers.GetTypesCount;
+            InitializeQueue(_barriersQueue, barriersTypesCount, 
+                barriersCapacity, barrierBehaviourPrefab);
             
             StartCoroutine(RestartingPool(i, j, firstSegment, secondSegment));
         }
@@ -236,6 +247,10 @@ namespace Pool
             
             QueueMixing(_environmentsQueue, i, 0, firstSegment.Environments);
             QueueMixing(_environmentsQueue, j, 1, secondSegment.Environments);
+            yield return null;
+            
+            QueueMixing(_barriersQueue, i, 0, firstSegment.Barriers);
+            QueueMixing(_barriersQueue, j, 1, secondSegment.Barriers);
             yield return null;
             
             StartCoroutine(MoveObjectsLoop());
