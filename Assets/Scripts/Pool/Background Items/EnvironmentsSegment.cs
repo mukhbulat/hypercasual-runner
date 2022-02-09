@@ -19,7 +19,7 @@ namespace Pool.Background_Items
 
         private void OnEnable()
         {
-            _segmentParts = new List<List<Vector3>>(1)
+            _segmentParts = new List<List<Vector3>>(5)
             {
                 Building2Small,
                 Building3Small,
