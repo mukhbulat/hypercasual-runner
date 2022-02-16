@@ -21,7 +21,7 @@ public class PlayerStats : MonoBehaviour, IRestartable
         get => _health;
         set
         {
-            if (_isInvulnerable) return;
+            if (_isInvulnerable && value < _health) return;
             
             HealthChange?.Invoke(value);
             
@@ -160,6 +160,7 @@ public class PlayerStats : MonoBehaviour, IRestartable
     
     public void Restart()
     {
+        _isInvulnerable = false;
         Health = 3;
         Coins = 0;
         TravelDistance = 0;

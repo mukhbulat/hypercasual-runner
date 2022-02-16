@@ -15,4 +15,5 @@ MonoBehaviour:
   Collectables: {fileID: 11400000, guid: 1ce665132d69f934b99f97a50aec19dd, type: 2}
   Platforms: {fileID: 11400000, guid: 4fd080298ee3aad4e843a286702cb316, type: 2}
   Environments: {fileID: 11400000, guid: b2c6861b7893537ae997dd209aae7f50, type: 2}
+  Barriers: {fileID: 11400000, guid: 6f1dfa916b8f6ba3da3ccdaa4eb0b1b7, type: 2}
   Length: 30

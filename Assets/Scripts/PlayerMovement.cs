@@ -206,6 +206,7 @@ public class PlayerMovement : MonoBehaviour, IRestartable
     public void Restart()
     {
         transform.position = _startingPosition;
+        animator.SetBool(InGame, true);
         _acceleration = speedIncrease.Evaluate(0);
         
         StopAllCoroutines();

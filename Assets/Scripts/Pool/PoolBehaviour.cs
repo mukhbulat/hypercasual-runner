@@ -20,8 +20,6 @@ namespace Pool
 
         private LevelSegment _currentSegment;
         private LevelSegment _nextSegment;
-
-        private bool _inMovingObjectsLoop;
         
         //Player
         [SerializeField] private Transform player;
@@ -118,8 +116,6 @@ namespace Pool
                     _nextSegment = levelSegments[nextSegmentIndex];
                     _nextSegmentNumber += 1;
                     
-                    _inMovingObjectsLoop = true;
-                    
                     QueueMixing(_platformsQueue, nextSegmentIndex, _nextSegmentNumber, _nextSegment.Platforms);
                     yield return null;
                     QueueMixing(_collectablesQueue, nextSegmentIndex, _nextSegmentNumber, _nextSegment.Collectables);
@@ -128,7 +124,6 @@ namespace Pool
                     yield return null;
                 }
 
-                _inMovingObjectsLoop = false;
                 yield return null;
             }
         }
@@ -197,16 +192,7 @@ namespace Pool
 
         #endregion
 
-        private IEnumerator WaitForLoopExitAndRestart()
-        {
-            while (_inMovingObjectsLoop)
-            {
-                yield return null;
-            }
-            ThirdPartOfRestart();
-        }
-
-        private void ThirdPartOfRestart()
+        public void Restart()
         {
             StopAllCoroutines();
 
@@ -217,13 +203,6 @@ namespace Pool
             var secondSegment = levelSegments[j];
             
             StartCoroutine(RestartingPool(i, j, firstSegment, secondSegment));
-        }
-
-        public void Restart()
-        // Restart here in three parts. First: this one, called by interface. Second - coroutine, which waits for all 
-        // queues (platforms, collectables, etc.) to be in one condition
-        {
-            StartCoroutine(WaitForLoopExitAndRestart());
         }
 
         private IEnumerator RestartingPool(int i, int j, LevelSegment firstSegment, LevelSegment secondSegment)
