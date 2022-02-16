@@ -43,19 +43,22 @@ public class PlayerMovement : MonoBehaviour, IRestartable
     private bool _isGrounded;
     // Data for restart.
     private Vector3 _startingPosition;
-    
+
 
     // Obstacles bypassing
     private bool _isBypassing;
     private float _playerHeight;
     private Vector3 _rayOffset;
 
+    private float _timeSinceLastObstacle = 0;
+    private float _timeToObstacleWork = 0.2f;
+
     private float _playerRadius;
     // Just a little value for ray offset.
     private float _delta = 0.05f;
 
     // Ratio on how strongly stumble will influence _yVelocity.
-    private float _bypassDistanceToVelocityRatio = 1f;
+    private float _bypassDistanceToVelocityRatio = 1.4f;
 
     private void Update()
     {
@@ -73,8 +76,7 @@ public class PlayerMovement : MonoBehaviour, IRestartable
     private void Movement()
     {
         _isGrounded = characterController.isGrounded;
-        
-        
+
         if (_isGrounded && _yVelocity < 0)
         {
             _yVelocity = 0;
@@ -110,6 +112,11 @@ public class PlayerMovement : MonoBehaviour, IRestartable
     {
         if (!_isGrounded)
         {
+            if (_timeSinceLastObstacle < _timeToObstacleWork)
+            {
+                _timeSinceLastObstacle += Time.deltaTime;
+                return;
+            }
             RaycastHit hit;
             Ray ray = new Ray(transform.position + _rayOffset, Vector3.down);
             
@@ -117,21 +124,21 @@ public class PlayerMovement : MonoBehaviour, IRestartable
             {
                 float distance = hit.distance - (_playerHeight - _delta * 2) / 2;
                 // Check the hit distance and respond accordingly
-                int animatorHash = distance < 0 ? HitHeadTrigger : ClimbTrigger;
+                int animatorHash = distance < 0 ? HitHeadTrigger : StumbleTrigger;
                 
                 if (Mathf.Abs(distance) < 0.25f * _playerHeight)
                 {
                     animator.SetTrigger(animatorHash);
                     
-                    playerStats.Health -= 2;
                     _yVelocity += distance * _bypassDistanceToVelocityRatio;
+                    _timeSinceLastObstacle = 0;
                 }
                 else if (Mathf.Abs(distance) < 0.35f * _playerHeight)
                 {
                     animator.SetTrigger(animatorHash);
 
-                    playerStats.Health -= 1;
                     _yVelocity += distance * _bypassDistanceToVelocityRatio;
+                    _timeSinceLastObstacle = 0;
                 }
                 else
                 {

@@ -78,7 +78,7 @@ namespace Pool.Collectables
             _childMeshRenderer.enabled = false;
             yield return new WaitForSeconds(particleLifetime);
             _particleSystem.Stop();
-            transform.position = Vector3.zero;
+            transform.position = new Vector3(0, -10, 0);
             _childMeshRenderer.enabled = true;
         }
         
