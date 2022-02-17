@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -68,8 +69,18 @@ namespace Pool.Collectables
         private void Awake()
         {
             _playerStats = GameObject.Find("PlayerStats").GetComponent<PlayerStats>();
-            _playerStats.DoubleCoins += OnDoubleCoins;
             _particleSystem = GetComponent<ParticleSystem>();
+        }
+
+        private void OnEnable()
+        {
+            _playerStats.DoubleCoins += OnDoubleCoins;
+        }
+
+        private void OnDisable()
+        {
+            
+            _playerStats.DoubleCoins -= OnDoubleCoins;
         }
 
         private IEnumerator ParticleEffectAndMove()

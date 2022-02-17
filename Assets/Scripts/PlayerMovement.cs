@@ -22,6 +22,7 @@ public class PlayerMovement : MonoBehaviour, IRestartable
     private static readonly int InGame = Animator.StringToHash("InGame");
     private static readonly int ClimbTrigger = Animator.StringToHash("ClimbTrigger");
     private static readonly int HitHeadTrigger = Animator.StringToHash("HitHeadTrigger");
+    private static readonly int GotDown = Animator.StringToHash("GotDown");
     // Enable/Disable movement.
     private bool _isEnabled;
     public bool IsEnabled
@@ -59,6 +60,13 @@ public class PlayerMovement : MonoBehaviour, IRestartable
 
     // Ratio on how strongly stumble will influence _yVelocity.
     private float _bypassDistanceToVelocityRatio = 1.4f;
+    private static readonly int CrouchTrigger = Animator.StringToHash("CrouchTrigger");
+    // Crouch
+    private float _crouchTime = 0.5f;
+    private bool _isCrouching = false;
+
+    private float _originalHeight;
+    private float _crouchHeight;
 
     private void Update()
     {
@@ -82,14 +90,52 @@ public class PlayerMovement : MonoBehaviour, IRestartable
             _yVelocity = 0;
         }
         
-        // Moving forward with given speed and acceleration
+        
         characterController.Move(Vector3.forward * _speed * _acceleration * Time.deltaTime);
         
         Jump();
 
+        Crouch();
+
         VerticalMoving();
         
     }
+
+    private void Crouch()
+    {
+        if (_isCrouching)
+        {
+            return;
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            StartCoroutine(CrouchCoroutine());
+        }
+    }
+
+    private IEnumerator CrouchCoroutine()
+    {
+        _isCrouching = true;
+        while (!_isGrounded)
+        {
+            _yVelocity = _gravity;
+            yield return null;
+        }
+
+        if (IsEnabled)
+        {
+            characterController.height = _crouchHeight;
+            
+            animator.SetTrigger(CrouchTrigger);
+        }
+
+        yield return new WaitForSeconds(_crouchTime);
+
+        _isCrouching = false;
+        characterController.height = _originalHeight;
+    }
+    
 
     private void Jump()
     {
@@ -97,7 +143,6 @@ public class PlayerMovement : MonoBehaviour, IRestartable
         {
             _yVelocity += Mathf.Sqrt(jumpHeight * -1 * _gravity);
         }
-
     }
 
     private void VerticalMoving()
@@ -110,6 +155,9 @@ public class PlayerMovement : MonoBehaviour, IRestartable
     
     private void HandleObstacleBypass()
     {
+        // Disgusting but easy solution.
+        if (_isCrouching) return;
+        
         if (!_isGrounded)
         {
             if (_timeSinceLastObstacle < _timeToObstacleWork)
@@ -175,6 +223,10 @@ public class PlayerMovement : MonoBehaviour, IRestartable
         _playerRadius = characterController.radius;
         _rayOffset = new Vector3(0, _playerHeight - _delta, _playerRadius + _delta);
         
+        // For crouching
+        _originalHeight = characterController.height;
+
+        _crouchHeight = _originalHeight / 2;
         
         _acceleration = speedIncrease.Evaluate(0);
         
@@ -196,7 +248,7 @@ public class PlayerMovement : MonoBehaviour, IRestartable
 
     private IEnumerator SpeedChangeOnMaxSpeed()
     {
-        while (true)
+        while (IsEnabled)
         {
             _currentTime += Time.deltaTime;
             if (_currentTime > timeOfMaxSpeedLoop)
@@ -210,11 +262,29 @@ public class PlayerMovement : MonoBehaviour, IRestartable
         }
     }
 
+    private void BarrierHit()
+    {
+        _isEnabled = false;
+        animator.SetBool(GotDown, true);
+        StartCoroutine(LoseCoroutine());
+    }
+
+    private IEnumerator LoseCoroutine()
+    {
+        yield return new WaitForSeconds(3);
+        animator.SetBool(GotDown, false);
+        playerStats.Health = 0;
+    }
+
     public void Restart()
     {
         transform.position = _startingPosition;
         animator.SetBool(InGame, true);
         _acceleration = speedIncrease.Evaluate(0);
+        
+        
+        _isCrouching = false;
+        characterController.height = _originalHeight;
         
         StopAllCoroutines();
         StartCoroutine(AcceleratingToMaxSpeed());
