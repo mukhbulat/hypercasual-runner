@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,13 @@ namespace Pool.Barriers
     public class BarrierBehaviour : MonoBehaviour, IPoolable
     {
         [SerializeField] private List<GameObject> childPrefabs;
+
+        private PlayerMovement _playerMovement;
+
+        private void Awake()
+        {
+            _playerMovement = GameObject.FindWithTag("Player").GetComponent<PlayerMovement>();
+        }
 
         #region Interfaces
 
@@ -37,6 +45,14 @@ namespace Pool.Barriers
         {
             Instantiate(childPrefabs[index], gameObject.transform);
         }
-        
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (_playerMovement.IsEnabled)
+            {
+                _playerMovement.BarrierHit();
+            }
+        }
+
     }
 }

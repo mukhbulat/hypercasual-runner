@@ -22,7 +22,8 @@ public class PlayerMovement : MonoBehaviour, IRestartable
     private static readonly int InGame = Animator.StringToHash("InGame");
     private static readonly int ClimbTrigger = Animator.StringToHash("ClimbTrigger");
     private static readonly int HitHeadTrigger = Animator.StringToHash("HitHeadTrigger");
-    private static readonly int GotDown = Animator.StringToHash("GotDown");
+    private static readonly int GotDownTrigger = Animator.StringToHash("GotDownTrigger");
+    private static readonly int CrouchTrigger = Animator.StringToHash("CrouchTrigger");
     // Enable/Disable movement.
     private bool _isEnabled;
     public bool IsEnabled
@@ -55,18 +56,20 @@ public class PlayerMovement : MonoBehaviour, IRestartable
     private float _timeToObstacleWork = 0.2f;
 
     private float _playerRadius;
+    private int _platformsMask = 1 << 6;
+    
     // Just a little value for ray offset.
     private float _delta = 0.05f;
 
     // Ratio on how strongly stumble will influence _yVelocity.
     private float _bypassDistanceToVelocityRatio = 1.4f;
-    private static readonly int CrouchTrigger = Animator.StringToHash("CrouchTrigger");
     // Crouch
     private float _crouchTime = 0.5f;
     private bool _isCrouching = false;
 
     private float _originalHeight;
     private float _crouchHeight;
+    
 
     private void Update()
     {
@@ -168,7 +171,7 @@ public class PlayerMovement : MonoBehaviour, IRestartable
             RaycastHit hit;
             Ray ray = new Ray(transform.position + _rayOffset, Vector3.down);
             
-            if (Physics.Raycast(ray, out hit, _playerHeight - _delta))
+            if (Physics.Raycast(ray, out hit, _playerHeight - _delta, _platformsMask))
             {
                 float distance = hit.distance - (_playerHeight - _delta * 2) / 2;
                 // Check the hit distance and respond accordingly
@@ -231,6 +234,7 @@ public class PlayerMovement : MonoBehaviour, IRestartable
         _acceleration = speedIncrease.Evaluate(0);
         
         StartCoroutine(AcceleratingToMaxSpeed());
+        
     }
 
     private IEnumerator AcceleratingToMaxSpeed()
@@ -262,17 +266,21 @@ public class PlayerMovement : MonoBehaviour, IRestartable
         }
     }
 
-    private void BarrierHit()
+    public void BarrierHit()
     {
         _isEnabled = false;
-        animator.SetBool(GotDown, true);
+        animator.SetTrigger(GotDownTrigger);
+        
+        characterController.height = _crouchHeight;
+        _yVelocity = _gravity;
+        VerticalMoving();
         StartCoroutine(LoseCoroutine());
     }
 
     private IEnumerator LoseCoroutine()
     {
         yield return new WaitForSeconds(3);
-        animator.SetBool(GotDown, false);
+        animator.SetBool(GotDownTrigger, false);
         playerStats.Health = 0;
     }
 

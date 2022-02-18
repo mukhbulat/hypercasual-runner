@@ -122,6 +122,8 @@ namespace Pool
                     yield return null;
                     QueueMixing(_environmentsQueue, nextSegmentIndex, _nextSegmentNumber, _nextSegment.Environments);
                     yield return null;
+                    QueueMixing(_barriersQueue, nextSegmentIndex, _nextSegmentNumber, _nextSegment.Barriers);
+                    yield return null;
                 }
 
                 yield return null;

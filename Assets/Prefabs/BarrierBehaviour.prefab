@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6496881646497230915}
   - component: {fileID: 6496881646497230914}
-  m_Layer: 0
+  - component: {fileID: 6815757229841010154}
+  m_Layer: 7
   m_Name: BarrierBehaviour
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -45,3 +46,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   childPrefabs:
   - {fileID: 1452510379669490163, guid: 99ec98359f91fc51988b0314c038e7ee, type: 3}
+--- !u!136 &6815757229841010154
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6496881646497230913}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 1, y: 1.5, z: 0}
