@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Pool.Background_Items;
 using Pool.Barriers;
 using Pool.Collectables;

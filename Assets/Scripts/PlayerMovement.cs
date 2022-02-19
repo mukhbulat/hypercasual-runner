@@ -1,8 +1,6 @@
-using System;
 using System.Collections;
 using Game;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class PlayerMovement : MonoBehaviour, IRestartable
 {
@@ -244,7 +242,6 @@ public class PlayerMovement : MonoBehaviour, IRestartable
 
     
     // Obstacles bypassing
-    private bool _isBypassing;
     private float _playerHeight;
     private Vector3 _rayOffset;
 
