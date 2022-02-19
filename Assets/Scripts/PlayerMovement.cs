@@ -6,16 +6,13 @@ using UnityEngine.EventSystems;
 
 public class PlayerMovement : MonoBehaviour, IRestartable
 {
+    #region General
+    
     // Components
     [SerializeField] private CharacterController characterController;
     [SerializeField] private Animator animator;
     [SerializeField] private PlayerStats playerStats;
-    // Values to tweak
-    [SerializeField] private float jumpHeight = 6f;
-    [SerializeField] private AnimationCurve speedIncrease;
-    [SerializeField] private AnimationCurve speedAtMaxSpeed;
-    [SerializeField] private float timeToGetFullSpeed = 60f;
-    [SerializeField] private float timeOfMaxSpeedLoop = 10f;
+    
     // Animator Parameters
     private static readonly int VerticalVelocity = Animator.StringToHash("VerticalVelocity");
     private static readonly int StumbleTrigger = Animator.StringToHash("StumbleTrigger");
@@ -35,42 +32,32 @@ public class PlayerMovement : MonoBehaviour, IRestartable
             animator.SetBool(InGame, value);
         }
     }
-    //
-    private readonly float _speed = 15f;
-    private float _acceleration;
-    private readonly float _gravity = -20.8f;
-    private float _currentTime;
     
-    private float _yVelocity;
-    private bool _isGrounded;
     // Data for restart.
     private Vector3 _startingPosition;
-
-
-    // Obstacles bypassing
-    private bool _isBypassing;
-    private float _playerHeight;
-    private Vector3 _rayOffset;
-
-    private float _timeSinceLastObstacle = 0;
-    private float _timeToObstacleWork = 0.2f;
-
-    private float _playerRadius;
-    private int _platformsMask = 1 << 6;
     
-    // Just a little value for ray offset.
-    private float _delta = 0.05f;
-
-    // Ratio on how strongly stumble will influence _yVelocity.
-    private float _bypassDistanceToVelocityRatio = 1.4f;
-    // Crouch
-    private float _crouchTime = 0.5f;
-    private bool _isCrouching = false;
-
-    private float _originalHeight;
-    private float _crouchHeight;
     
+    private void Awake()
+    {
+        // For restarting purposes.
+        _startingPosition = transform.position;
 
+        // For obstacle bypassing.
+        _playerHeight = characterController.height;
+        _playerRadius = characterController.radius;
+        _rayOffset = new Vector3(0, _playerHeight - _delta, _playerRadius + _delta);
+        
+        // For crouching
+        _originalHeight = characterController.height;
+
+        _crouchHeight = _originalHeight / 2;
+        
+        _acceleration = speedIncrease.Evaluate(0);
+        
+        StartCoroutine(AcceleratingToMaxSpeed());
+        
+    }
+    
     private void Update()
     {
         if (IsEnabled)
@@ -82,8 +69,104 @@ public class PlayerMovement : MonoBehaviour, IRestartable
             HandleAnimatorTree();
         }
     }
+    
+    // Two coroutines for acceleration.
+    private IEnumerator AcceleratingToMaxSpeed()
+    {
+        while (_currentTime < timeToGetFullSpeed)
+        {
+            _currentTime += Time.deltaTime;
+            _acceleration = speedIncrease.Evaluate(_currentTime / timeToGetFullSpeed);
+            yield return null;
+        }
 
+        _currentTime = 0;
+        StartCoroutine(SpeedChangeOnMaxSpeed());
+    }
+
+    private IEnumerator SpeedChangeOnMaxSpeed()
+    {
+        while (IsEnabled)
+        {
+            _currentTime += Time.deltaTime;
+            if (_currentTime > timeOfMaxSpeedLoop)
+            {
+                _currentTime -= timeOfMaxSpeedLoop;
+            }
+
+            _acceleration = speedAtMaxSpeed.Evaluate(_currentTime / timeOfMaxSpeedLoop);
+
+            yield return null;
+        }
+    }
+
+    
+    private void HandleAnimatorTree()
+    {
+        if (_isGrounded)
+        {
+            animator.SetFloat(VerticalVelocity, 0.5f);
+        }
+        else if (_yVelocity > 0.1f)
+        {
+            animator.SetFloat(VerticalVelocity, 1f);
+        }
+        else
+        {
+            animator.SetFloat(VerticalVelocity, 0f);
+        }
+    }
+    
+    private IEnumerator LoseCoroutine()
+    {
+        yield return new WaitForSeconds(3);
+        animator.SetBool(GotDownTrigger, false);
+        playerStats.Health = 0;
+    }
+
+    public void Restart()
+    {
+        transform.position = _startingPosition;
+        animator.SetBool(InGame, true);
+        _acceleration = speedIncrease.Evaluate(0);
         
+        
+        _isCrouching = false;
+        characterController.height = _originalHeight;
+        
+        StopAllCoroutines();
+        StartCoroutine(AcceleratingToMaxSpeed());
+    }
+    
+    #endregion
+
+    #region Movement
+
+    
+    // Values to tweak.
+    [SerializeField] private float jumpHeight = 6f;
+    [SerializeField] private AnimationCurve speedIncrease;
+    [SerializeField] private AnimationCurve speedAtMaxSpeed;
+    [SerializeField] private float timeToGetFullSpeed = 60f;
+    [SerializeField] private float timeOfMaxSpeedLoop = 10f;
+    
+    // Changing values.
+    private readonly float _speed = 15f;
+    private float _acceleration;
+    private readonly float _gravity = -20.8f;
+    private float _currentTime;
+    
+    private float _yVelocity;
+    private bool _isGrounded;
+    
+    
+    // Crouch
+    private float _crouchTime = 0.5f;
+    private bool _isCrouching = false;
+
+    private float _originalHeight;
+    private float _crouchHeight;
+    
     private void Movement()
     {
         _isGrounded = characterController.isGrounded;
@@ -101,9 +184,17 @@ public class PlayerMovement : MonoBehaviour, IRestartable
         Crouch();
 
         VerticalMoving();
-        
     }
 
+
+    private void Jump()
+    {
+        if (_isGrounded && Input.GetMouseButtonDown(0))
+        {
+            _yVelocity += Mathf.Sqrt(jumpHeight * -1 * _gravity);
+        }
+    }
+    
     private void Crouch()
     {
         if (_isCrouching)
@@ -138,15 +229,6 @@ public class PlayerMovement : MonoBehaviour, IRestartable
         _isCrouching = false;
         characterController.height = _originalHeight;
     }
-    
-
-    private void Jump()
-    {
-        if (_isGrounded && Input.GetMouseButtonDown(0))
-        {
-            _yVelocity += Mathf.Sqrt(jumpHeight * -1 * _gravity);
-        }
-    }
 
     private void VerticalMoving()
     {
@@ -155,6 +237,29 @@ public class PlayerMovement : MonoBehaviour, IRestartable
         characterController.Move(new Vector3(0, _yVelocity * Time.deltaTime, 0));
 
     }
+
+    #endregion
+
+    #region Barriers and obstacles
+
+    
+    // Obstacles bypassing
+    private bool _isBypassing;
+    private float _playerHeight;
+    private Vector3 _rayOffset;
+
+    private float _timeSinceLastObstacle = 0;
+    private float _timeToObstacleWork = 0.2f;
+
+    private float _playerRadius;
+    private int _platformsMask = 1 << 6;
+    
+    // Just a little value for ray offset.
+    private float _delta = 0.05f;
+
+    // Ratio on how strongly stumble will influence _yVelocity.
+    private float _bypassDistanceToVelocityRatio = 1.4f;
+    
     
     private void HandleObstacleBypass()
     {
@@ -200,72 +305,6 @@ public class PlayerMovement : MonoBehaviour, IRestartable
         }
     }
 
-    private void HandleAnimatorTree()
-    {
-        if (_isGrounded)
-        {
-            animator.SetFloat(VerticalVelocity, 0.5f);
-        }
-        else if (_yVelocity > 0.1f)
-        {
-            animator.SetFloat(VerticalVelocity, 1f);
-        }
-        else
-        {
-            animator.SetFloat(VerticalVelocity, 0f);
-        }
-    }
-
-    private void Awake()
-    {
-        // For restarting purposes.
-        _startingPosition = transform.position;
-
-        // For obstacle bypassing.
-        _playerHeight = characterController.height;
-        _playerRadius = characterController.radius;
-        _rayOffset = new Vector3(0, _playerHeight - _delta, _playerRadius + _delta);
-        
-        // For crouching
-        _originalHeight = characterController.height;
-
-        _crouchHeight = _originalHeight / 2;
-        
-        _acceleration = speedIncrease.Evaluate(0);
-        
-        StartCoroutine(AcceleratingToMaxSpeed());
-        
-    }
-
-    private IEnumerator AcceleratingToMaxSpeed()
-    {
-        while (_currentTime < timeToGetFullSpeed)
-        {
-            _currentTime += Time.deltaTime;
-            _acceleration = speedIncrease.Evaluate(_currentTime / timeToGetFullSpeed);
-            yield return null;
-        }
-
-        _currentTime = 0;
-        StartCoroutine(SpeedChangeOnMaxSpeed());
-    }
-
-    private IEnumerator SpeedChangeOnMaxSpeed()
-    {
-        while (IsEnabled)
-        {
-            _currentTime += Time.deltaTime;
-            if (_currentTime > timeOfMaxSpeedLoop)
-            {
-                _currentTime -= timeOfMaxSpeedLoop;
-            }
-
-            _acceleration = speedAtMaxSpeed.Evaluate(_currentTime / timeOfMaxSpeedLoop);
-
-            yield return null;
-        }
-    }
-
     public void BarrierHit()
     {
         _isEnabled = false;
@@ -277,24 +316,5 @@ public class PlayerMovement : MonoBehaviour, IRestartable
         StartCoroutine(LoseCoroutine());
     }
 
-    private IEnumerator LoseCoroutine()
-    {
-        yield return new WaitForSeconds(3);
-        animator.SetBool(GotDownTrigger, false);
-        playerStats.Health = 0;
-    }
-
-    public void Restart()
-    {
-        transform.position = _startingPosition;
-        animator.SetBool(InGame, true);
-        _acceleration = speedIncrease.Evaluate(0);
-        
-        
-        _isCrouching = false;
-        characterController.height = _originalHeight;
-        
-        StopAllCoroutines();
-        StartCoroutine(AcceleratingToMaxSpeed());
-    }
+    #endregion
 }
