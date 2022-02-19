@@ -34,6 +34,9 @@ public class PlayerMovement : MonoBehaviour, IRestartable
     // Data for restart.
     private Vector3 _startingPosition;
     
+    // Data for lose.
+    private float _timeBeforeFallToLose = 0.4f;
+    private float _timeAfterFallToLose = 1.3f;
     
     private void Awake()
     {
@@ -117,8 +120,14 @@ public class PlayerMovement : MonoBehaviour, IRestartable
     
     private IEnumerator LoseCoroutine()
     {
-        yield return new WaitForSeconds(3);
-        animator.SetBool(GotDownTrigger, false);
+        // Waiting a bit before dropping player on the ground.
+        yield return new WaitForSeconds(_timeBeforeFallToLose);
+
+        characterController.height = _crouchHeight;
+        StartCoroutine(FallingDownOnLose());
+        
+        yield return new WaitForSeconds(_timeAfterFallToLose);
+        
         playerStats.Health = 0;
     }
 
@@ -236,6 +245,16 @@ public class PlayerMovement : MonoBehaviour, IRestartable
 
     }
 
+    private IEnumerator FallingDownOnLose()
+    {
+        _yVelocity = 0;
+        while (true)
+        {
+            VerticalMoving();
+            yield return null;
+        }
+    }
+
     #endregion
 
     #region Barriers and obstacles
@@ -307,8 +326,6 @@ public class PlayerMovement : MonoBehaviour, IRestartable
         _isEnabled = false;
         animator.SetTrigger(GotDownTrigger);
         
-        characterController.height = _crouchHeight;
-        _yVelocity = _gravity;
         VerticalMoving();
         StartCoroutine(LoseCoroutine());
     }
